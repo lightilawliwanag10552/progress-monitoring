@@ -2746,7 +2746,6 @@
             document.getElementById('notesModalSub').textContent = `${member.purok || ''} — ${member.purokGrupo || ''}`;
             const textarea = document.getElementById('quickNotesTextarea');
             textarea.value = member.notes || '';
-            // Kung view-only, i-disable ang textarea para di mamodify
             textarea.disabled = !isAdmin;
             
             const modal = document.getElementById('notesModal');
@@ -2856,7 +2855,6 @@
         function handleBaptismStatusChange() {
             const statusVal = document.getElementById('inputBaptismStatus').value;
             const dateTextEl = document.getElementById('inputBaptismDateText');
-            const dateHiddenEl = document.getElementById('inputBaptismDate');
             if (statusVal === 'Approved') {
                 if (dateTextEl) {
                     dateTextEl.required = true;
