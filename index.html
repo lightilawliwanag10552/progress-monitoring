@@ -298,13 +298,13 @@
                 <input
                     type="text"
                     id="searchInput"
-                    oninput="renderMembers()"
+                    oninput="resetPageAndRender()"
                     placeholder="Search by Name or Purok-Grupo..."
                     class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition"
                 >
             </div>
             <div class="flex flex-wrap items-center gap-2.5">
-                <select id="stageFilter" onchange="renderMembers()" class="flex-1 md:w-48 px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/30">
+                <select id="stageFilter" onchange="resetPageAndRender()" class="flex-1 md:w-48 px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/30">
                     <option value="ALL">All Stages &amp; Status</option>
                     <option value="Doktrina">Doktrina</option>
                     <option value="PreScreening">For 304 (≤5 left)</option>
@@ -316,20 +316,20 @@
                     <option value="BaptismOnHold">For Baptism: On-hold</option>
                     <option value="BaptismFinalScreening">Baptism: For Final Screening</option>
                 </select>
-                <select id="activityFilter" onchange="renderMembers()" class="flex-1 md:w-44 px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/30">
+                <select id="activityFilter" onchange="resetPageAndRender()" class="flex-1 md:w-44 px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/30">
                     <option value="ALL">All Activity</option>
                     <option value="Active">Active</option>
                     <option value="Inactive">Inactive (2w+)</option>
                     <option value="WithRemarks">With Remarks / Notes</option>
                     <option value="NoRemarks">No Remarks / Notes</option>
                 </select>
-                <select id="efFilter" onchange="renderMembers()" class="flex-1 md:w-40 px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/30">
+                <select id="efFilter" onchange="resetPageAndRender()" class="flex-1 md:w-40 px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/30">
                     <option value="ALL">All EF Status</option>
                     <option value="Approved">Approved</option>
                     <option value="Pending">Pending</option>
                     <option value="For Follow-up">For Follow-up</option>
                 </select>
-                <select id="sortSelect" onchange="renderMembers()" class="flex-1 md:w-64 px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/30">
+                <select id="sortSelect" onchange="resetPageAndRender()" class="flex-1 md:w-64 px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/30">
                     <option value="name_asc">Sort: Name (A–Z)</option>
                     <option value="ef_week_desc">Sort: EF Approved Week (Latest–Oldest)</option>
                     <option value="w304_week_desc">Sort: 304 Approved Week (Latest–Oldest)</option>
@@ -347,6 +347,14 @@
 
         <!-- Member Cards List -->
         <section id="membersContainer" class="space-y-3"></section>
+
+        <!-- Pagination Controls -->
+        <section id="paginationContainer" class="hidden flex-col sm:flex-row items-center justify-between gap-3 bg-white rounded-2xl border border-slate-200 px-4 py-3 shadow-xs">
+            <div id="paginationInfo" class="text-xs font-semibold text-slate-600">
+                Showing 1–10 of 0 members
+            </div>
+            <div id="paginationControls" class="flex items-center gap-1.5 flex-wrap justify-center"></div>
+        </section>
 
         <!-- Empty State -->
         <section id="emptyState" class="hidden bg-white rounded-2xl border border-dashed border-slate-300 p-10 text-center max-w-lg mx-auto my-8">
@@ -848,11 +856,15 @@
     </div>
 
     <script>
-        // PASSWORDS NA NAKITANG GUSTO MO
+        // PASSWORDS
         const VIEW_PASSCODE  = "LegazpiView"; // Password para sa View Mode Only
         const ADMIN_PASSCODE = "Legazpilaw";  // Password para sa Admin Mode (Full Access)
 
-        let selectedLoginMode = "view"; // Default selected tab sa login
+        // PAGINATION SETTINGS
+        const ITEMS_PER_PAGE = 10;
+        let currentPage = 1;
+
+        let selectedLoginMode = "view";
         let isAdmin = false;
 
         function selectLoginMode(mode) {
@@ -1013,7 +1025,6 @@
             renderAll();
         }
 
-        // BAGONG REALTIME SYNC: Nakikinig sa 'members' sub-collection sa halip na iisang main_document
         function setupFirestoreRealtimeSync() {
             db.collection('members').onSnapshot((snapshot) => {
                 isSyncingFromCloud = true;
@@ -1030,7 +1041,6 @@
                 if (cloudMembers.length > 0) {
                     members = cloudMembers;
                 } else if (members.length > 0 && isAdmin) {
-                    // Kung walang laman sa cloud sub-collection pero may luma sa local/migration, i-migrate agad
                     migrateLegacyMembersToCloud();
                 }
 
@@ -1041,7 +1051,6 @@
                 console.error("Firestore sync error:", error);
             });
 
-            // Sync din ang Purok Names mula sa metadata document kung meron
             db.collection('tracker_data').doc('metadata').onSnapshot((doc) => {
                 if (doc.exists && doc.data().purokNames) {
                     PUROK_NAMES = { ...DEFAULT_PUROK_NAMES, ...doc.data().purokNames };
@@ -1050,7 +1059,6 @@
             });
         }
 
-        // Awtomatikong migration mula sa lumang main_document patungo sa bagong sub-collection
         async function migrateLegacyMembersToCloud() {
             if (!isAdmin || members.length === 0) return;
             const batch = db.batch();
@@ -1060,18 +1068,15 @@
             });
             try {
                 await batch.commit();
-                console.log("Migration ng mga lumang miyembro patungong sub-collection ay matagumpay!");
             } catch (e) {
                 console.error("Migration error:", e);
             }
         }
 
-        // BAGONG PERSIST FUNCTION: Nagse-save bawat miyembro sa sarili nitong document ID
         function persistMembers() {
-            if (!isAdmin) return; // Guard: View-Only users cannot save changes
+            if (!isAdmin) return;
             persistMembersLocal();
             if (!isSyncingFromCloud) {
-                // I-save ang bawat miyembro sa indibidwal na document
                 const batch = db.batch();
                 members.forEach(m => {
                     const docRef = db.collection('members').doc(m.id);
@@ -1095,6 +1100,21 @@
                 savePurokNames();
             } catch (e) {
                 showToast('Storage full!');
+            }
+        }
+
+        // Pagination Helpers
+        function resetPageAndRender() {
+            currentPage = 1;
+            renderMembers();
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            renderMembers();
+            const container = document.getElementById('membersContainer');
+            if (container) {
+                container.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
 
@@ -1861,7 +1881,7 @@
 
         function startEditPurokName(event, purok) {
             event.stopPropagation();
-            if (!isAdmin) return; // Guard
+            if (!isAdmin) return;
             editingPurokKey = purok;
             renderPurokTabs();
             lucide.createIcons();
@@ -2042,6 +2062,7 @@
 
         function selectPurok(purok) {
             selectedPurok = purok;
+            currentPage = 1;
             renderPurokTabs();
             updateStats();
             renderMembers();
@@ -2057,6 +2078,7 @@
             if (stageEl) {
                 stageEl.value = (stageFilterValue !== 'ALL' && stageEl.value === stageFilterValue) ? 'ALL' : stageFilterValue;
             }
+            currentPage = 1;
             updateStats();
             renderMembers();
         }
@@ -2473,6 +2495,7 @@
         function renderMembers() {
             const container = document.getElementById('membersContainer');
             const emptyState = document.getElementById('emptyState');
+            const paginationContainer = document.getElementById('paginationContainer');
             if (!container || !emptyState) return;
 
             const search = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
@@ -2579,14 +2602,28 @@
             if (filtered.length === 0) {
                 container.innerHTML = '';
                 emptyState.classList.remove('hidden');
+                if (paginationContainer) {
+                    paginationContainer.classList.add('hidden');
+                    paginationContainer.classList.remove('flex');
+                }
                 lucide.createIcons();
                 return;
             }
 
             emptyState.classList.add('hidden');
 
-            container.innerHTML = filtered.map((member, idx) => {
-                const rowNumber = idx + 1;
+            // Pagination Calculation (10 per page)
+            const totalItems = filtered.length;
+            const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+            const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, totalItems);
+            const paginatedItems = filtered.slice(startIndex, endIndex);
+
+            container.innerHTML = paginatedItems.map((member, idx) => {
+                const rowNumber = startIndex + idx + 1;
                 const theme = PUROK_THEMES[member.purok] || { badge: 'bg-slate-100 text-slate-800 border-slate-200', cardBorder: 'border-l-4 border-l-indigo-500' };
                 const l303Count = Math.min(30, Object.keys(getL303Map(member)).length);
                 const l305Count = Math.min(15, Object.keys(member.l305 || {}).length);
@@ -2771,6 +2808,49 @@
                 `;
             }).join('');
 
+            // Render Pagination Controls
+            if (paginationContainer) {
+                if (totalPages > 1) {
+                    paginationContainer.classList.remove('hidden');
+                    paginationContainer.classList.add('flex');
+
+                    document.getElementById('paginationInfo').textContent = `Showing ${startIndex + 1}–${endIndex} of ${totalItems} members (Page ${currentPage} of ${totalPages})`;
+
+                    let controlsHtml = `
+                        <button type="button" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:pointer-events-none transition cursor-pointer flex items-center gap-1">
+                            <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i> Prev
+                        </button>
+                    `;
+
+                    for (let p = 1; p <= totalPages; p++) {
+                        if (p === 1 || p === totalPages || (p >= currentPage - 1 && p <= currentPage + 1)) {
+                            controlsHtml += `
+                                <button type="button" onclick="goToPage(${p})" class="w-8 h-8 rounded-xl text-xs font-extrabold transition cursor-pointer ${
+                                    p === currentPage
+                                        ? 'bg-indigo-600 text-white shadow-xs'
+                                        : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                                }">
+                                    ${p}
+                                </button>
+                            `;
+                        } else if (p === currentPage - 2 || p === currentPage + 2) {
+                            controlsHtml += `<span class="px-1 text-slate-400 text-xs font-bold">...</span>`;
+                        }
+                    }
+
+                    controlsHtml += `
+                        <button type="button" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:pointer-events-none transition cursor-pointer flex items-center gap-1">
+                            Next <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                        </button>
+                    `;
+
+                    document.getElementById('paginationControls').innerHTML = controlsHtml;
+                } else {
+                    paginationContainer.classList.add('hidden');
+                    paginationContainer.classList.remove('flex');
+                }
+            }
+
             lucide.createIcons();
         }
 
@@ -2891,7 +2971,6 @@
         function handleBaptismStatusChange() {
             const statusVal = document.getElementById('inputBaptismStatus').value;
             const dateTextEl = document.getElementById('inputBaptismDateText');
-            const dateHiddenEl = document.getElementById('inputBaptismDate');
             if (statusVal === 'Approved') {
                 if (dateTextEl) {
                     dateTextEl.required = true;
@@ -3137,7 +3216,6 @@
                 };
                 members.push(newMemberObj);
                 
-                // Direktang i-save sa kanyang sub-collection document sa Firestore
                 if (isAdmin) {
                     db.collection('members').doc(newMemberId).set(newMemberObj).catch(err => {
                         console.error("Error saving new member:", err);
@@ -3729,7 +3807,6 @@
             const memberIdToDelete = pendingDeleteMemberId;
             members = members.filter(m => m.id !== memberIdToDelete);
             
-            // Tanggalin din ang dokumento sa Firestore sub-collection
             if (isAdmin) {
                 db.collection('members').doc(memberIdToDelete).delete().catch(err => {
                     console.error("Error deleting member from Firestore:", err);
@@ -3786,7 +3863,6 @@
                             return m;
                         });
                         persistMembers();
-                        // I-upload lahat sa Firestore sub-collection
                         migrateLegacyMembersToCloud();
                         closeBackupModal();
                         renderAll();
