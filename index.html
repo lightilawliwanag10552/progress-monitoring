@@ -1013,42 +1013,78 @@
             renderAll();
         }
 
+        // BAGONG REALTIME SYNC: Nakikinig sa 'members' sub-collection sa halip na iisang main_document
         function setupFirestoreRealtimeSync() {
-            db.collection('tracker_data').doc('main_document').onSnapshot((doc) => {
-                if (doc.exists) {
-                    const data = doc.data();
-                    if (data && data.members && Array.isArray(data.members)) {
-                        isSyncingFromCloud = true;
-                        members = data.members.map(m => {
-                            if (!m.l303 && m.l310) m.l303 = { ...m.l310 };
-                            if (!m.baptismStatus) m.baptismStatus = 'Pending';
-                            if (!m.baptismDate) m.baptismDate = '';
-                            normalizeMemberC309Structure(m);
-                            return m;
-                        });
-                        if (data.purokNames && typeof data.purokNames === 'object') {
-                            PUROK_NAMES = { ...DEFAULT_PUROK_NAMES, ...data.purokNames };
-                        }
-                        persistMembersLocal();
-                        renderAll();
-                        isSyncingFromCloud = false;
-                    }
+            db.collection('members').onSnapshot((snapshot) => {
+                isSyncingFromCloud = true;
+                const cloudMembers = [];
+                snapshot.forEach((doc) => {
+                    const m = { id: doc.id, ...doc.data() };
+                    if (!m.l303 && m.l310) m.l303 = { ...m.l310 };
+                    if (!m.baptismStatus) m.baptismStatus = 'Pending';
+                    if (!m.baptismDate) m.baptismDate = '';
+                    normalizeMemberC309Structure(m);
+                    cloudMembers.push(m);
+                });
+
+                if (cloudMembers.length > 0) {
+                    members = cloudMembers;
+                } else if (members.length > 0 && isAdmin) {
+                    // Kung walang laman sa cloud sub-collection pero may luma sa local/migration, i-migrate agad
+                    migrateLegacyMembersToCloud();
                 }
+
+                persistMembersLocal();
+                renderAll();
+                isSyncingFromCloud = false;
             }, (error) => {
                 console.error("Firestore sync error:", error);
             });
+
+            // Sync din ang Purok Names mula sa metadata document kung meron
+            db.collection('tracker_data').doc('metadata').onSnapshot((doc) => {
+                if (doc.exists && doc.data().purokNames) {
+                    PUROK_NAMES = { ...DEFAULT_PUROK_NAMES, ...doc.data().purokNames };
+                    renderAll();
+                }
+            });
         }
 
+        // Awtomatikong migration mula sa lumang main_document patungo sa bagong sub-collection
+        async function migrateLegacyMembersToCloud() {
+            if (!isAdmin || members.length === 0) return;
+            const batch = db.batch();
+            members.forEach(m => {
+                const docRef = db.collection('members').doc(m.id);
+                batch.set(docRef, m, { merge: true });
+            });
+            try {
+                await batch.commit();
+                console.log("Migration ng mga lumang miyembro patungong sub-collection ay matagumpay!");
+            } catch (e) {
+                console.error("Migration error:", e);
+            }
+        }
+
+        // BAGONG PERSIST FUNCTION: Nagse-save bawat miyembro sa sarili nitong document ID
         function persistMembers() {
             if (!isAdmin) return; // Guard: View-Only users cannot save changes
             persistMembersLocal();
             if (!isSyncingFromCloud) {
-                db.collection('tracker_data').doc('main_document').set({
-                    members: members,
+                // I-save ang bawat miyembro sa indibidwal na document
+                const batch = db.batch();
+                members.forEach(m => {
+                    const docRef = db.collection('members').doc(m.id);
+                    batch.set(docRef, m, { merge: true });
+                });
+                batch.set(db.collection('tracker_data').doc('metadata'), {
                     purokNames: PUROK_NAMES,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                }).catch((err) => {
-                    console.error("Error saving to Firestore:", err);
+                }, { merge: true });
+
+                batch.commit().catch((err) => {
+                    console.error("Error saving member to Firestore:", err);
+                    showToast('Error saving to Cloud!');
                 });
             }
         }
@@ -2855,6 +2891,7 @@
         function handleBaptismStatusChange() {
             const statusVal = document.getElementById('inputBaptismStatus').value;
             const dateTextEl = document.getElementById('inputBaptismDateText');
+            const dateHiddenEl = document.getElementById('inputBaptismDate');
             if (statusVal === 'Approved') {
                 if (dateTextEl) {
                     dateTextEl.required = true;
@@ -3077,8 +3114,9 @@
                 for (let i = 1; i <= initial309; i++) {
                     c309Map[currentYr][i] = { mw: todayStr, we: '' };
                 }
-                members.push({
-                    id: 'm_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+                const newMemberId = 'm_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+                const newMemberObj = {
+                    id: newMemberId,
                     fullName,
                     purok,
                     purokGrupo,
@@ -3096,7 +3134,15 @@
                     qrCode: currentFormQrDataUrl,
                     createdAt: Date.now(),
                     updatedAt: Date.now()
-                });
+                };
+                members.push(newMemberObj);
+                
+                // Direktang i-save sa kanyang sub-collection document sa Firestore
+                if (isAdmin) {
+                    db.collection('members').doc(newMemberId).set(newMemberObj).catch(err => {
+                        console.error("Error saving new member:", err);
+                    });
+                }
                 showToast('New member added!');
             }
 
@@ -3680,7 +3726,16 @@
 
         function confirmDeleteMember() {
             if (!isAdmin || !pendingDeleteMemberId) return;
-            members = members.filter(m => m.id !== pendingDeleteMemberId);
+            const memberIdToDelete = pendingDeleteMemberId;
+            members = members.filter(m => m.id !== memberIdToDelete);
+            
+            // Tanggalin din ang dokumento sa Firestore sub-collection
+            if (isAdmin) {
+                db.collection('members').doc(memberIdToDelete).delete().catch(err => {
+                    console.error("Error deleting member from Firestore:", err);
+                });
+            }
+
             persistMembers();
             closeDeleteModal();
             renderAll();
@@ -3731,6 +3786,8 @@
                             return m;
                         });
                         persistMembers();
+                        // I-upload lahat sa Firestore sub-collection
+                        migrateLegacyMembersToCloud();
                         closeBackupModal();
                         renderAll();
                         showToast(`Restored ${members.length} member records!`);
