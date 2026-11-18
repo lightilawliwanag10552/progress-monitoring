@@ -2962,7 +2962,7 @@
             modal.classList.remove('flex');
         }
 
-        function saveMember(event) {
+        async function saveMember(event) {
             event.preventDefault();
             if (!isAdmin) return;
             const editId = document.getElementById('editMemberId').value;
@@ -2986,6 +2986,25 @@
                 if (dateTextEl) dateTextEl.focus();
                 return;
             }
+
+            const processFileAsync = (fileInputId, isPng) => {
+                return new Promise((resolve) => {
+                    const fileInput = document.getElementById(fileInputId);
+                    if (fileInput && fileInput.files && fileInput.files[0]) {
+                        compressImage(fileInput.files[0], 300, isPng, (compressedUrl) => {
+                            resolve(compressedUrl);
+                        });
+                    } else {
+                        resolve(null);
+                    }
+                });
+            };
+
+            const newPicUrl = await processFileAsync('inputPicFile', false);
+            if (newPicUrl) currentFormPicDataUrl = newPicUrl;
+
+            const newQrUrl = await processFileAsync('inputQrFile', true);
+            if (newQrUrl) currentFormQrDataUrl = newQrUrl;
 
             const todayStr = getTodayUsFormatted();
 
@@ -3109,7 +3128,7 @@
                     canvas.height = h;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, w, h);
-                    callback(isPng ? canvas.toDataURL('image/png', 0.85) : canvas.toDataURL('image/jpeg', 0.8));
+                    callback(isPng ? canvas.toDataURL('image/png', 0.85) : canvas.toDataURL('image/jpeg', 0.75));
                 };
                 img.src = e.target.result;
             };
@@ -3120,7 +3139,7 @@
             if (!isAdmin) return;
             const file = event.target.files[0];
             if (!file) return;
-            compressImage(file, 360, false, (dataUrl) => {
+            compressImage(file, 300, false, (dataUrl) => {
                 currentFormPicDataUrl = dataUrl;
                 document.getElementById('picPreviewImg').src = dataUrl;
                 document.getElementById('picUploadPrompt').classList.add('hidden');
@@ -3162,7 +3181,7 @@
             if (!isAdmin) return;
             const file = event.target.files[0];
             if (!file || !activePicMemberId) return;
-            compressImage(file, 360, false, (dataUrl) => {
+            compressImage(file, 300, false, (dataUrl) => {
                 const idx = members.findIndex(m => m.id === activePicMemberId);
                 if (idx !== -1) {
                     members[idx].picture = dataUrl;
@@ -3181,7 +3200,7 @@
             if (!isAdmin) return;
             const file = event.target.files[0];
             if (!file) return;
-            compressImage(file, 400, true, (dataUrl) => {
+            compressImage(file, 300, true, (dataUrl) => {
                 currentFormQrDataUrl = dataUrl;
                 document.getElementById('qrPreviewImg').src = dataUrl;
                 document.getElementById('qrUploadPrompt').classList.add('hidden');
@@ -3223,7 +3242,7 @@
             if (!isAdmin) return;
             const file = event.target.files[0];
             if (!file || !activeQrMemberId) return;
-            compressImage(file, 400, true, (dataUrl) => {
+            compressImage(file, 300, true, (dataUrl) => {
                 const idx = members.findIndex(m => m.id === activeQrMemberId);
                 if (idx !== -1) {
                     members[idx].qrCode = dataUrl;
