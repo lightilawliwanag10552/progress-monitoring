@@ -252,35 +252,47 @@
                 </div>
             </div>
 
-            <!-- Card 5: Bautisado Card -->
-            <div onclick="openBaptismModal('ALL')" class="bg-gradient-to-br from-white to-sky-50/80 rounded-2xl border border-sky-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-sky-400 hover:shadow-md transition">
-                <div onclick="event.stopPropagation()">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-1.5">
-                            <button id="prevBtnBaptism" onclick="changeBaptismYear(-1)" title="Previous Year" class="w-6 h-6 rounded-lg bg-sky-100 hover:bg-sky-200 text-sky-800 flex items-center justify-center transition cursor-pointer">
-                                <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
-                            </button>
-                            <span id="statBaptismYearTitle" class="text-xs font-bold uppercase tracking-wider text-sky-900">Bautisado 2026</span>
-                            <button id="nextBtnBaptism" onclick="changeBaptismYear(1)" title="Next Year" class="w-6 h-6 rounded-lg bg-sky-100 hover:bg-sky-200 text-sky-800 flex items-center justify-center transition cursor-pointer">
-                                <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-                            </button>
+            <!-- Card 5: Bautisado Card (Split Top: Bautisado & Puroks | Bottom: Scrollable WEEKS Absent-Badge Members) -->
+            <div class="bg-gradient-to-br from-white to-sky-50/80 rounded-2xl border border-sky-200 p-4 shadow-xs flex flex-col justify-between hover:border-sky-400 hover:shadow-md transition">
+                <div onclick="openBaptismModal('ALL')" class="cursor-pointer">
+                    <div onclick="event.stopPropagation()">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-1.5">
+                                <button id="prevBtnBaptism" onclick="changeBaptismYear(-1)" title="Previous Year" class="w-6 h-6 rounded-lg bg-sky-100 hover:bg-sky-200 text-sky-800 flex items-center justify-center transition cursor-pointer">
+                                    <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+                                </button>
+                                <span id="statBaptismYearTitle" class="text-xs font-bold uppercase tracking-wider text-sky-900">Bautisado 2026</span>
+                                <button id="nextBtnBaptism" onclick="changeBaptismYear(1)" title="Next Year" class="w-6 h-6 rounded-lg bg-sky-100 hover:bg-sky-200 text-sky-800 flex items-center justify-center transition cursor-pointer">
+                                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                            <span class="w-8 h-8 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center">
+                                <i data-lucide="droplets" class="w-4 h-4"></i>
+                            </span>
                         </div>
-                        <span class="w-8 h-8 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center">
-                            <i data-lucide="droplets" class="w-4 h-4"></i>
-                        </span>
+                        <div class="mt-2 flex items-baseline gap-2">
+                            <span id="statBaptismPct" class="text-2xl font-extrabold text-slate-900">0%</span>
+                            <span id="statBaptismDetails" class="text-xs text-slate-500 font-semibold">0 / 0 overall</span>
+                        </div>
                     </div>
-                    <div class="mt-2 flex items-baseline gap-2">
-                        <span id="statBaptismPct" class="text-2xl font-extrabold text-slate-900">0%</span>
-                        <span id="statBaptismDetails" class="text-xs text-slate-500 font-semibold">0 / 0 overall</span>
+                    <div class="mt-2 pt-2 border-t border-sky-100">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-sky-800">Purok w/ Bautisado:</span>
+                            <span class="text-[9px] text-slate-400 italic">Click Purok to view</span>
+                        </div>
+                        <div id="statBaptismPuroks" class="flex flex-wrap gap-1 max-h-12 overflow-y-auto pr-0.5">
+                            <span class="text-[11px] text-slate-400 italic">None for this year</span>
+                        </div>
                     </div>
                 </div>
-                <div class="mt-2.5 pt-2 border-t border-sky-100">
-                    <div class="flex items-center justify-between mb-1.5">
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-sky-800">Purok w/ Bautisado:</span>
-                        <span class="text-[9px] text-slate-400 italic">Click Purok to view</span>
+
+                <div onclick="openWeeklyModal('ABSENT_WEEKS')" class="mt-2.5 pt-2 border-t-2 border-sky-200/80 cursor-pointer group" title="Click to expand & sort per Purok">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-red-900 group-hover:underline">WEEKS (<span id="statAbsentWeeksCount">0</span>):</span>
+                        <span class="text-[9px] text-slate-400 group-hover:text-sky-700 italic">Click card to expand</span>
                     </div>
-                    <div id="statBaptismPuroks" class="flex flex-wrap gap-1 max-h-20 overflow-y-auto pr-0.5">
-                        <span class="text-[11px] text-slate-400 italic">None for this year</span>
+                    <div id="statAbsentWeeksList" class="text-[11px] text-slate-700 max-h-20 overflow-y-auto pr-1 space-y-0.5 leading-snug">
+                        <span class="text-slate-400 italic">None with absent badge</span>
                     </div>
                 </div>
             </div>
@@ -483,6 +495,21 @@
                         </div>
                     </div>
                     <p id="hintBaptismText" class="text-[11px] text-slate-500 italic">Available once 303 (30/30), 305 (15/15), and 309 (48/48) are completed. Approving removes the member from active monitoring and logs them under Bautisado.</p>
+                </div>
+
+                <!-- Tigil Status -->
+                <div id="fieldTigilContainer" class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 transition space-y-2">
+                    <div class="flex items-center justify-between">
+                        <label for="inputTigilStatus" class="block text-xs font-bold uppercase tracking-wider text-slate-700">Tigil Status</label>
+                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-200 text-slate-700 text-[10px] font-bold">
+                            Active / Archived
+                        </span>
+                    </div>
+                    <select id="inputTigilStatus" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-500/30">
+                        <option value="Pending">Pending</option>
+                        <option value="Approved">Approved</option>
+                    </select>
+                    <p class="text-[11px] text-slate-500 italic">Kapag naka-Approved, mawawala sa active progress monitoring pero searchable pa rin sa search bar.</p>
                 </div>
 
                 <div>
@@ -1161,6 +1188,14 @@
             return !!(member && member.baptismStatus === 'Approved');
         }
 
+        function isMemberTigilApproved(member) {
+            return !!(member && member.tigilStatus === 'Approved');
+        }
+
+        function isMemberArchivedOrTigil(member) {
+            return isMemberBaptized(member) || isMemberTigilApproved(member);
+        }
+
         function getBaptismYearBounds() {
             const currentYr = new Date().getFullYear();
             let maxYr = currentYr;
@@ -1685,17 +1720,86 @@
         function renderWeeklyModalContent() {
             if (!activeWeeklyModalType) return;
             const currentWeekNum = getIsoWeekNumber(new Date());
-            const is309 = activeWeeklyModalType === '309';
-            const targetWeekNum = currentWeekNum + (is309 ? weekOffset309 : weekOffset305);
-
-            const activeMembers = members.filter(m => !isMemberBaptized(m));
+            const activeMembers = members.filter(m => !isMemberArchivedOrTigil(m));
             const modalPurok = activeWeeklyModalPurok || 'ALL';
             const scopeMembers = modalPurok === 'ALL' ? activeMembers : activeMembers.filter(m => m.purok === modalPurok);
+            const scopeTitle = modalPurok === 'ALL' ? 'All Puroks' : modalPurok;
+
+            if (activeWeeklyModalType === 'ABSENT_WEEKS') {
+                document.getElementById('weeklyModalTitle').textContent = `Absent-Week Badges (${scopeTitle})`;
+                document.getElementById('weeklyModalSubtitle').textContent = 'Consecutive full weeks absent in Pagsamba 309 (sorted per Purok)';
+
+                const iconEl = document.getElementById('weeklyModalIcon');
+                iconEl.className = 'w-9 h-9 rounded-xl bg-red-100 text-red-900 flex items-center justify-center';
+                iconEl.innerHTML = `<i data-lucide="alert-circle" class="w-5 h-5"></i>`;
+
+                const prevBtn = document.querySelector('#weeklyModal button[onclick="changeModalWeeklyOffset(-1)"]');
+                const nextBtn = document.getElementById('weeklyModalNextBtn');
+                if (prevBtn) { prevBtn.style.opacity = '0.3'; prevBtn.style.pointerEvents = 'none'; }
+                if (nextBtn) { nextBtn.style.opacity = '0.3'; nextBtn.style.pointerEvents = 'none'; }
+
+                const mwWeBarEl = document.getElementById('weeklyModalMwWeBar');
+                if (mwWeBarEl) {
+                    mwWeBarEl.classList.add('hidden');
+                    mwWeBarEl.classList.remove('flex');
+                }
+
+                const absentBadgeMembers = scopeMembers
+                    .map(m => ({ member: m, weeks: getConsecutive309AbsentWeeks(m) }))
+                    .filter(item => item.weeks >= 1)
+                    .sort((a, b) => {
+                        const pA = PUROK_LIST.indexOf(a.member.purok);
+                        const pB = PUROK_LIST.indexOf(b.member.purok);
+                        if (pA !== pB) return pA - pB;
+                        if (b.weeks !== a.weeks) return b.weeks - a.weeks;
+                        return (a.member.fullName || '').localeCompare(b.member.fullName || '');
+                    });
+
+                const pctVal = scopeMembers.length > 0 ? Math.round((absentBadgeMembers.length / scopeMembers.length) * 100) : 0;
+                document.getElementById('weeklyModalPct').textContent = `${pctVal}%`;
+                document.getElementById('weeklyModalDetails').textContent = `${absentBadgeMembers.length} / ${scopeMembers.length} ${scopeMembers.length === 1 ? 'member' : 'members'}`;
+
+                const missingHeaderEl = document.getElementById('weeklyModalMissingHeader');
+                if (missingHeaderEl) {
+                    missingHeaderEl.innerHTML = `ABSENT-WEEK BADGE MEMBERS (<span id="weeklyModalMissingCount">${absentBadgeMembers.length}</span>):`;
+                }
+
+                const missingListEl = document.getElementById('weeklyModalMissingList');
+                if (absentBadgeMembers.length === 0) {
+                    missingListEl.innerHTML = `<div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-500 text-center">Walang member na may absent-week badge sa ${scopeTitle}.</div>`;
+                } else {
+                    missingListEl.innerHTML = absentBadgeMembers.map((item, idx) => {
+                        const m = item.member;
+                        const theme = PUROK_THEMES[m.purok] || { badge: 'bg-slate-100 text-slate-800' };
+                        const label = item.weeks === 1 ? '1-week' : `${item.weeks}-weeks`;
+                        return `
+                            <div onclick="closeWeeklyModal(); openProgressModal('${m.id}')" class="flex items-center justify-between p-2.5 bg-slate-50 hover:bg-sky-50/70 border border-slate-200 hover:border-sky-300 rounded-xl cursor-pointer transition">
+                                <div class="flex items-center gap-2 min-w-0">
+                                    <span class="text-[11px] font-extrabold text-slate-400 w-5 shrink-0">${idx + 1}.</span>
+                                    <span class="text-xs font-bold text-slate-900 truncate">${escapeHtml(m.fullName)}</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 shrink-0">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-red-900 text-white">${escapeHtml(label)}</span>
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-extrabold border ${theme.badge}">${escapeHtml(m.purok)}</span>
+                                    <span class="text-[10px] font-bold text-slate-500">${escapeHtml(m.purokGrupo)}</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                lucide.createIcons();
+                return;
+            }
+
+            const prevBtn = document.querySelector('#weeklyModal button[onclick="changeModalWeeklyOffset(-1)"]');
+            if (prevBtn) { prevBtn.style.opacity = '1'; prevBtn.style.pointerEvents = 'auto'; }
+
+            const is309 = activeWeeklyModalType === '309';
+            const targetWeekNum = currentWeekNum + (is309 ? weekOffset309 : weekOffset305);
             const rawTargetMembers = is309 ? scopeMembers : scopeMembers.filter(m => Object.keys(getL303Map(m)).length >= 30);
             const targetMembers = rawTargetMembers.filter(m => isMemberApplicableForWeek(m, is309 ? '309' : '305', targetWeekNum));
 
             const getMapFn = is309 ? (m => m.c309 || {}) : (m => m.l305 || {});
-            const scopeTitle = modalPurok === 'ALL' ? 'All Puroks' : modalPurok;
 
             document.getElementById('weeklyModalTitle').textContent = `${is309 ? '309' : '305'} Week ${targetWeekNum} Review (${scopeTitle})`;
             document.getElementById('weeklyModalSubtitle').textContent = is309 ? 'Overall member participation for Pagsamba 309' : 'Sinusubok member participation for Pulong-Panalangin 305';
@@ -2010,7 +2114,7 @@
 
         function renderPurokTabs() {
             const container = document.getElementById('purokTabs');
-            const activeMembers = members.filter(m => !isMemberBaptized(m));
+            const activeMembers = members.filter(m => !isMemberArchivedOrTigil(m));
             const totalCount = activeMembers.length;
             const totalD = activeMembers.filter(m => Object.keys(getL303Map(m)).length < 30).length;
             const totalS = activeMembers.filter(m => Object.keys(getL303Map(m)).length >= 30).length;
@@ -2100,7 +2204,7 @@
         }
 
         function updateStats() {
-            const activeMembers = members.filter(m => !isMemberBaptized(m));
+            const activeMembers = members.filter(m => !isMemberArchivedOrTigil(m));
             const scopeMembers = selectedPurok === 'ALL' ? activeMembers : activeMembers.filter(m => m.purok === selectedPurok);
             const total = scopeMembers.length;
             const activePuroks = selectedPurok === 'ALL' ? new Set(activeMembers.map(m => m.purok)).size : (total > 0 ? 1 : 0);
@@ -2334,6 +2438,36 @@
                                 <span>${shortP}</span>
                                 <span class="px-1 rounded bg-white/80 text-slate-900">${item.count}</span>
                             </button>
+                        `;
+                    }).join('');
+                }
+            }
+
+            const absentBadgeCountEl = document.getElementById('statAbsentWeeksCount');
+            const absentBadgeListEl = document.getElementById('statAbsentWeeksList');
+            if (absentBadgeCountEl && absentBadgeListEl) {
+                const absentBadgeMembers = scopeMembers
+                    .map(m => ({ member: m, weeks: getConsecutive309AbsentWeeks(m) }))
+                    .filter(item => item.weeks >= 1)
+                    .sort((a, b) => b.weeks - a.weeks || (a.member.fullName || '').localeCompare(b.member.fullName || ''));
+
+                absentBadgeCountEl.textContent = absentBadgeMembers.length;
+
+                if (absentBadgeMembers.length === 0) {
+                    absentBadgeListEl.innerHTML = `<span class="text-slate-400 italic">None with absent badge</span>`;
+                } else {
+                    absentBadgeListEl.innerHTML = absentBadgeMembers.map(item => {
+                        const m = item.member;
+                        const label = item.weeks === 1 ? '1-week' : `${item.weeks}-weeks`;
+                        const shortPurok = (m.purok || '').replace('PUROK ', 'P');
+                        return `
+                            <div onclick="event.stopPropagation(); openProgressModal('${m.id}')" class="flex items-center justify-between gap-1 truncate hover:bg-sky-100/70 px-1 py-0.5 rounded cursor-pointer transition" title="Click to open progress">
+                                <span class="font-medium text-slate-800 truncate">• ${escapeHtml(m.fullName)}</span>
+                                <div class="flex items-center gap-1 shrink-0">
+                                    <span class="px-1.5 py-0.2 rounded text-[9px] font-extrabold bg-red-900 text-white">${escapeHtml(label)}</span>
+                                    <span class="text-[9px] font-bold px-1 rounded bg-slate-200 text-slate-700">${escapeHtml(shortPurok)}</span>
+                                </div>
+                            </div>
                         `;
                     }).join('');
                 }
@@ -2599,10 +2733,12 @@
 
             let filtered = members.filter(m => {
                 if (isMemberBaptized(m)) return false;
+                const isTigilDone = isMemberTigilApproved(m);
+                if (isTigilDone && !search) return false;
 
                 if (selectedPurok !== 'ALL' && m.purok !== selectedPurok) return false;
                 if (search) {
-                    const hay = `${m.fullName || ''} ${m.purokGrupo || ''} ${m.purok || ''}`.toLowerCase();
+                    const hay = `${m.fullName || ''} ${m.purokGrupo || ''} ${m.purok || ''} ${isTigilDone ? 'tigil approved' : ''}`.toLowerCase();
                     if (!hay.includes(search)) return false;
                 }
 
@@ -2731,6 +2867,7 @@
                 const pct309 = Math.round((c309Count / 48) * 100);
 
                 const inactive = isMemberInactive(member);
+                const isTigilDone = isMemberTigilApproved(member);
                 const absentWeeks309 = getConsecutive309AbsentWeeks(member);
                 const absentWeeksLabel = absentWeeks309 === 1 ? '1-week' : `${absentWeeks309}-weeks`;
                 const efStatus = member.efStatus || 'Approved';
@@ -2800,6 +2937,7 @@
                                                 <i data-lucide="droplets" class="w-2.5 h-2.5"></i> For Baptism
                                             </span>
                                         ` : ''}
+                                        ${isTigilDone ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-rose-700 text-white border border-rose-800">Tigil: Approved</span>` : ''}
                                         ${inactive ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-100 text-rose-700 border border-rose-200">Inactive (2w+)</span>` : ''}
                                     </div>
                                     <h3 class="text-base font-extrabold text-slate-900 leading-snug break-words mt-1">${escapeHtml(member.fullName)}</h3>
@@ -3100,6 +3238,7 @@
             document.getElementById('inputBaptismStatus').value = 'Pending';
             document.getElementById('inputBaptismDate').value = '';
             document.getElementById('inputBaptismDateText').value = '';
+            document.getElementById('inputTigilStatus').value = 'Pending';
             document.getElementById('inputNotes').value = '';
             removePicFromForm();
             removeQrFromForm();
@@ -3133,6 +3272,7 @@
             document.getElementById('input304WeekSelect').value = wk304 ? `Week ${wk304}` : '';
 
             document.getElementById('inputBaptismStatus').value = member.baptismStatus || 'Pending';
+            document.getElementById('inputTigilStatus').value = member.tigilStatus || 'Pending';
             const rawBaptDate = member.baptismDate || '';
             document.getElementById('inputBaptismDateText').value = displayDateString(rawBaptDate);
             const parsedBapt = rawBaptDate ? parseUsOrIsoDate(rawBaptDate) : null;
@@ -3190,6 +3330,7 @@
             const ref304 = document.getElementById('input304Ref').value.trim();
             const baptismStatus = document.getElementById('inputBaptismStatus').value;
             const baptismDate = document.getElementById('inputBaptismDateText').value.trim();
+            const tigilStatus = document.getElementById('inputTigilStatus').value || 'Pending';
             const notes = document.getElementById('inputNotes').value.trim();
 
             if (!fullName || !purokGrupo) return;
@@ -3272,6 +3413,7 @@
                         ref304,
                         baptismStatus,
                         baptismDate,
+                        tigilStatus,
                         notes,
                         c309: byYear,
                         picture: currentFormPicDataUrl,
@@ -3283,6 +3425,8 @@
                         const info = getBaptismYearAndMonth(members[idx]);
                         selectedBaptismYear = info.year;
                         showToast(`Baptism Approved! Nailipat na sa Bautisado ${info.year}.`);
+                    } else if (tigilStatus === 'Approved') {
+                        showToast('Tigil Approved! Natanggal sa active monitoring (searchable pa rin sa search bar).');
                     } else {
                         showToast('Member record updated!');
                     }
@@ -3305,6 +3449,7 @@
                     ref304: '',
                     baptismStatus: 'Pending',
                     baptismDate: '',
+                    tigilStatus: 'Pending',
                     notes,
                     l303: {},
                     l305: {},
