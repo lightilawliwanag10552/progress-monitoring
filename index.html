@@ -2495,6 +2495,83 @@
             }
         }
 
+        function getConsecutive309AbsentWeeks(member) {
+            if (!member) return 0;
+            const now = new Date();
+            const currentYr = now.getFullYear();
+            const currentWeek = getIsoWeekNumber(now);
+            const lastCompletedWeek = currentWeek - 1;
+            if (lastCompletedWeek < 1) return 0;
+
+            const byYear = normalizeMemberC309Structure(member);
+            const yearWeeks = byYear[currentYr] || {};
+
+            // Determine the first week in currentYr where 309 attendance is expected
+            let startWeek = null;
+
+            // 1. Check 309 'Approved' anchor
+            const anchor = get309ApprovedAnchor(member);
+            if (anchor) {
+                if (anchor.year < currentYr) {
+                    startWeek = 1;
+                } else if (anchor.year === currentYr) {
+                    startWeek = anchor.week + 1;
+                } else {
+                    return 0;
+                }
+            }
+
+            // 2. Check EF Approved Week + 1 if anchor wasn't set
+            if (startWeek === null) {
+                const efStatus = member.efStatus || 'Approved';
+                const efWk = extractWeekNumber(member.efRef || '');
+                if (efStatus === 'Approved' && efWk !== null) {
+                    startWeek = efWk + 1;
+                }
+            }
+
+            // 3. Also check earliest week with any recorded 309 attendance in currentYr (or prior years)
+            let earliestLoggedWeek = null;
+            Object.keys(byYear).forEach(yrKey => {
+                const yrNum = Number(yrKey);
+                const wMap = byYear[yrKey] || {};
+                Object.keys(wMap).forEach(wkKey => {
+                    const slot = wMap[wkKey];
+                    if (slot && ((slot.mw && slot.mw !== 'Absent') || (slot.we && slot.we !== 'Absent'))) {
+                        if (yrNum < currentYr) {
+                            earliestLoggedWeek = 1;
+                        } else if (yrNum === currentYr) {
+                            const wNum = Number(wkKey);
+                            if (earliestLoggedWeek === null || wNum < earliestLoggedWeek) {
+                                earliestLoggedWeek = wNum;
+                            }
+                        }
+                    }
+                });
+            });
+
+            if (earliestLoggedWeek !== null) {
+                startWeek = startWeek === null ? earliestLoggedWeek : Math.min(startWeek, earliestLoggedWeek);
+            }
+
+            if (startWeek === null || startWeek > lastCompletedWeek) return 0;
+
+            let consecutiveAbsent = 0;
+            for (let w = lastCompletedWeek; w >= startWeek; w--) {
+                const slot = yearWeeks[w] || {};
+                const status = get309WeekServiceStatus(member, w);
+                const isApprovedSlot = slot.mw === 'Approved' || slot.we === 'Approved';
+
+                // If present in either MW or WE (or marked Approved), the consecutive absent streak stops
+                if (status.hasAny || isApprovedSlot) {
+                    break;
+                }
+                consecutiveAbsent++;
+            }
+
+            return consecutiveAbsent;
+        }
+
         function isMemberInactive(member) {
             const twoWeeksMs = 14 * 24 * 60 * 60 * 1000;
             const lastUpdate = member.updatedAt || member.createdAt || Date.now();
@@ -2654,6 +2731,8 @@
                 const pct309 = Math.round((c309Count / 48) * 100);
 
                 const inactive = isMemberInactive(member);
+                const absentWeeks309 = getConsecutive309AbsentWeeks(member);
+                const absentWeeksLabel = absentWeeks309 === 1 ? '1-week' : `${absentWeeks309}-weeks`;
                 const efStatus = member.efStatus || 'Approved';
                 const efBadgeClass = efStatus === 'Approved'
                     ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
@@ -2684,7 +2763,10 @@
                                     ${rowNumber}
                                 </div>
 
-                                <div class="shrink-0">
+                                <div class="shrink-0 flex flex-col items-center gap-1">
+                                    ${absentWeeks309 >= 1 ? `
+                                        <span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded-md text-[9px] font-extrabold bg-red-900 text-white border border-red-950 shadow-2xs leading-none" title="Consecutive full weeks absent in Pagsamba 309">${absentWeeksLabel}</span>
+                                    ` : ''}
                                     ${member.picture ? `
                                         <button type="button" onclick="openPicModal('${member.id}')" title="View Member Picture" class="w-14 h-14 rounded-2xl border-2 border-indigo-100 bg-slate-100 overflow-hidden hover:border-indigo-400 transition cursor-pointer shadow-2xs">
                                             <img src="${member.picture}" alt="${escapeHtml(member.fullName)}" class="w-full h-full object-cover">
