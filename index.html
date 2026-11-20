@@ -107,18 +107,18 @@
     <!-- Main Content -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-        <!-- Summary KPI Cards (Left Fixed Card + Right 13-Card Carousel) -->
-        <section class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-4 items-stretch">
-            <!-- Card 1: Fixed Total Members & Status Counters Card (Left) -->
-            <div class="lg:col-span-5 bg-gradient-to-br from-white to-indigo-50/70 rounded-2xl border border-indigo-200 p-4 shadow-xs flex flex-col justify-between">
+        <!-- Summary KPI Cards (Fixed Total Members & Stages + Fixed Bautisado Card + Right 12-Card Carousel) -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-3.5 sm:gap-4 items-stretch">
+            <!-- Card 1: Fixed Total Members & Status Counters Card -->
+            <div class="lg:col-span-4 bg-gradient-to-br from-white to-indigo-50/70 rounded-2xl border border-indigo-200 p-4 shadow-xs flex flex-col justify-between">
                 <div>
-                    <div class="flex items-center justify-between">
+                    <div class="flex items-center justify-between gap-2">
                         <span id="cardTitleTotal" class="text-xs font-bold uppercase tracking-wider text-indigo-900">Total Members &amp; Stages</span>
                         <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
                             <i data-lucide="users" class="w-4 h-4"></i>
                         </span>
                     </div>
-                    <div class="mt-2 flex items-baseline justify-between">
+                    <div class="mt-2 flex items-baseline justify-between gap-2 flex-wrap">
                         <div>
                             <span id="statTotalMembers" class="text-2xl font-extrabold text-slate-900">0</span>
                             <span class="text-xs text-slate-500 font-semibold ml-1">total</span>
@@ -134,55 +134,87 @@
                 <div id="breakdownMembers" class="mt-3 pt-2.5 border-t border-indigo-100 grid grid-cols-2 gap-1.5"></div>
             </div>
 
-            <!-- Right Column: 13-Card Summary Carousel Container -->
-            <div class="lg:col-span-7 flex flex-col justify-between gap-2">
-                <!-- Carousel Header Controls -->
-                <div class="flex items-center justify-between gap-2 bg-white/90 border border-slate-200 rounded-xl px-2.5 py-1.5 shadow-2xs">
-                    <div class="flex items-center gap-1.5 min-w-0">
-                        <button type="button" onclick="changeSummaryCarousel(-1)" title="Previous Summary Card" class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-indigo-100 text-slate-700 hover:text-indigo-800 flex items-center justify-center transition cursor-pointer shrink-0">
+            <!-- Card 2: Fixed Bautisado Summary Card (Katabi ng Total Members & Stages) -->
+            <div onclick="openBaptismModal('ALL')" class="lg:col-span-3 bg-gradient-to-br from-white to-sky-50/80 rounded-2xl border border-sky-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-sky-400 hover:shadow-md transition">
+                <div onclick="event.stopPropagation()">
+                    <div class="flex items-center justify-between gap-1.5">
+                        <div class="flex items-center gap-1.5 min-w-0">
+                            <button type="button" id="prevBtnBaptism" onclick="changeBaptismYear(-1)" title="Previous Year" class="w-7 h-7 sm:w-6 sm:h-6 rounded-lg bg-sky-100 hover:bg-sky-200 active:bg-sky-300 text-sky-800 flex items-center justify-center transition cursor-pointer shrink-0">
+                                <i data-lucide="chevron-left" class="w-4 h-4 sm:w-3.5 sm:h-3.5"></i>
+                            </button>
+                            <span id="statBaptismYearTitle" class="text-xs font-bold uppercase tracking-wider text-sky-900 truncate">Bautisado 2026</span>
+                            <button type="button" id="nextBtnBaptism" onclick="changeBaptismYear(1)" title="Next Year" class="w-7 h-7 sm:w-6 sm:h-6 rounded-lg bg-sky-100 hover:bg-sky-200 active:bg-sky-300 text-sky-800 flex items-center justify-center transition cursor-pointer shrink-0">
+                                <i data-lucide="chevron-right" class="w-4 h-4 sm:w-3.5 sm:h-3.5"></i>
+                            </button>
+                        </div>
+                        <span class="w-8 h-8 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
+                            <i data-lucide="droplets" class="w-4 h-4"></i>
+                        </span>
+                    </div>
+                    <div class="mt-2 flex items-baseline gap-2 flex-wrap">
+                        <span id="statBaptismPct" class="text-2xl font-extrabold text-slate-900">0%</span>
+                        <span id="statBaptismDetails" class="text-xs text-slate-500 font-semibold">0 / 0 overall</span>
+                    </div>
+                </div>
+                <div class="mt-2.5 pt-2 border-t border-sky-100">
+                    <div class="flex items-center justify-between gap-1 mb-1.5">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-sky-800">Purok w/ Bautisado:</span>
+                        <span class="text-[9px] text-slate-400 italic shrink-0">Click to view</span>
+                    </div>
+                    <div id="statBaptismPuroks" class="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto pr-0.5">
+                        <span class="text-[11px] text-slate-400 italic">None for this year</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: 12-Card Summary Carousel Container -->
+            <div class="md:col-span-2 lg:col-span-5 flex flex-col justify-between gap-2">
+                <!-- Carousel Header Controls (Responsive Mobile-Friendly Navigation Arrows & Dropdown) -->
+                <div class="flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 bg-white/95 border border-slate-200 rounded-xl px-2.5 py-2 sm:py-1.5 shadow-2xs">
+                    <div class="flex items-center gap-1.5 w-full sm:w-auto flex-1 min-w-0">
+                        <button type="button" onclick="changeSummaryCarousel(-1)" aria-label="Previous Summary Card" title="Previous Summary Card" class="w-8 h-8 sm:w-7 sm:h-7 rounded-lg bg-slate-100 hover:bg-indigo-100 active:bg-indigo-200 text-slate-700 hover:text-indigo-800 flex items-center justify-center transition cursor-pointer shrink-0 border border-slate-200/80">
                             <i data-lucide="chevron-left" class="w-4 h-4"></i>
                         </button>
-                        <select id="summaryCarouselSelect" onchange="goToSummaryCarousel(parseInt(this.value, 10))" aria-label="Select Summary Card" class="text-xs font-bold text-slate-800 bg-transparent hover:bg-slate-50 rounded-lg px-1.5 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 cursor-pointer truncate max-w-[200px] sm:max-w-[280px]">
-                            <option value="0">1/13 • 303, 305 &amp; 309 Summary</option>
-                            <option value="1">2/13 • 309 Week</option>
-                            <option value="2">3/13 • 305 Week</option>
-                            <option value="3">4/13 • Bautisado</option>
-                            <option value="4">5/13 • WEEKS (Absent Badges)</option>
-                            <option value="5">6/13 • EF Week</option>
-                            <option value="6">7/13 • 304 Approved (304 Week)</option>
-                            <option value="7">8/13 • Baptism: On hold</option>
-                            <option value="8">9/13 • For Final Screening</option>
-                            <option value="9">10/13 • Baptism: Pending</option>
-                            <option value="10">11/13 • 304: Pending</option>
-                            <option value="11">12/13 • EF: Pending</option>
-                            <option value="12">13/13 • For ≤304</option>
+                        <select id="summaryCarouselSelect" onchange="goToSummaryCarousel(parseInt(this.value, 10))" aria-label="Select Summary Card" class="flex-1 min-w-0 text-xs font-bold text-slate-800 bg-slate-50/70 sm:bg-transparent hover:bg-slate-100 rounded-lg px-2 py-1.5 sm:py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 cursor-pointer truncate border border-slate-200/60 sm:border-0">
+                            <option value="0">1/12 • 303, 305 &amp; 309 Summary</option>
+                            <option value="1">2/12 • 309 Week</option>
+                            <option value="2">3/12 • 305 Week</option>
+                            <option value="3">4/12 • WEEKS (Absent Badges)</option>
+                            <option value="4">5/12 • EF Week</option>
+                            <option value="5">6/12 • 304 Approved (304 Week)</option>
+                            <option value="6">7/12 • Baptism: On hold</option>
+                            <option value="7">8/12 • For Final Screening</option>
+                            <option value="8">9/12 • Baptism: Pending</option>
+                            <option value="9">10/12 • 304: Pending</option>
+                            <option value="10">11/12 • EF: Pending</option>
+                            <option value="11">12/12 • For ≤304</option>
                         </select>
-                        <button type="button" onclick="changeSummaryCarousel(1)" title="Next Summary Card" class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-indigo-100 text-slate-700 hover:text-indigo-800 flex items-center justify-center transition cursor-pointer shrink-0">
+                        <button type="button" onclick="changeSummaryCarousel(1)" aria-label="Next Summary Card" title="Next Summary Card" class="w-8 h-8 sm:w-7 sm:h-7 rounded-lg bg-slate-100 hover:bg-indigo-100 active:bg-indigo-200 text-slate-700 hover:text-indigo-800 flex items-center justify-center transition cursor-pointer shrink-0 border border-slate-200/80">
                             <i data-lucide="chevron-right" class="w-4 h-4"></i>
                         </button>
                     </div>
                     <!-- Carousel Indicator Dots -->
-                    <div id="summaryCarouselDots" class="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5 px-1"></div>
+                    <div id="summaryCarouselDots" class="flex items-center justify-center sm:justify-end gap-1 w-full sm:w-auto overflow-x-auto no-scrollbar py-0.5 px-1"></div>
                 </div>
 
-                <!-- Carousel Slides Wrapper -->
+                <!-- Carousel Slides Wrapper (12 Slides: 0 to 11) -->
                 <div class="flex-1 relative">
                     <!-- Slide 0: Combined 303, 305 & 309 Complete + Overall Progress -->
                     <div data-carousel-slide="0" onclick="openSummaryCardModal('SUMMARY_303_305_309')" class="summary-carousel-slide h-full bg-gradient-to-br from-white to-amber-50/70 rounded-2xl border border-amber-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-amber-400 hover:shadow-md transition">
                         <div>
-                            <div class="flex items-center justify-between">
-                                <div><span id="cardTitleSummary" class="text-xs font-bold uppercase tracking-wider text-amber-900 block">303, 305 &amp; 309 Summary</span><span class="text-[9px] text-slate-400 italic">Click card to expand per Purok</span></div>
+                            <div class="flex items-center justify-between gap-2">
+                                <div class="min-w-0"><span id="cardTitleSummary" class="text-xs font-bold uppercase tracking-wider text-amber-900 block truncate">303, 305 &amp; 309 Summary</span><span class="text-[9px] text-slate-400 italic">Click card to expand per Purok</span></div>
                                 <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
                                     <i data-lucide="award" class="w-4 h-4"></i>
                                 </span>
                             </div>
                             <div class="mt-2">
-                                <div class="flex items-baseline justify-between">
+                                <div class="flex items-baseline justify-between gap-2">
                                     <div>
                                         <span id="statAvg309" class="text-2xl font-extrabold text-slate-900">0%</span>
                                         <span class="text-[11px] font-bold text-amber-700 ml-1">Overall Combined</span>
                                     </div>
-                                    <span id="statTotal309Counts" class="text-[11px] text-slate-500 font-semibold">0 / 0 total</span>
+                                    <span id="statTotal309Counts" class="text-[11px] text-slate-500 font-semibold shrink-0">0 / 0 total</span>
                                 </div>
                                 <div class="w-full h-1.5 bg-amber-100 rounded-full overflow-hidden mt-1">
                                     <div id="statBar309Overall" class="h-full bg-amber-500 rounded-full transition-all" style="width: 0%"></div>
@@ -211,17 +243,17 @@
                     <!-- Slide 1: 309 Week Card -->
                     <div data-carousel-slide="1" onclick="openWeeklyModal('309')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-emerald-50/70 rounded-2xl border border-emerald-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-emerald-400 hover:shadow-md transition">
                         <div onclick="event.stopPropagation()">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-1.5">
-                                    <button onclick="changeWeeklyOffset('309', -1)" title="Previous Week" class="w-6 h-6 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 flex items-center justify-center transition cursor-pointer">
-                                        <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+                            <div class="flex items-center justify-between gap-1.5">
+                                <div class="flex items-center gap-1.5 min-w-0">
+                                    <button type="button" onclick="changeWeeklyOffset('309', -1)" title="Previous Week" class="w-7 h-7 sm:w-6 sm:h-6 rounded-lg bg-emerald-100 hover:bg-emerald-200 active:bg-emerald-300 text-emerald-800 flex items-center justify-center transition cursor-pointer shrink-0">
+                                        <i data-lucide="chevron-left" class="w-4 h-4 sm:w-3.5 sm:h-3.5"></i>
                                     </button>
-                                    <span id="stat309WeekTitle" class="text-xs font-bold uppercase tracking-wider text-emerald-900">309 Week —</span>
-                                    <button id="nextBtn309" onclick="changeWeeklyOffset('309', 1)" title="Next Week" class="w-6 h-6 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 flex items-center justify-center transition cursor-pointer">
-                                        <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                    <span id="stat309WeekTitle" class="text-xs font-bold uppercase tracking-wider text-emerald-900 truncate">309 Week —</span>
+                                    <button type="button" id="nextBtn309" onclick="changeWeeklyOffset('309', 1)" title="Next Week" class="w-7 h-7 sm:w-6 sm:h-6 rounded-lg bg-emerald-100 hover:bg-emerald-200 active:bg-emerald-300 text-emerald-800 flex items-center justify-center transition cursor-pointer shrink-0">
+                                        <i data-lucide="chevron-right" class="w-4 h-4 sm:w-3.5 sm:h-3.5"></i>
                                     </button>
                                 </div>
-                                <span class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                                <span class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
                                     <i data-lucide="calendar-check-2" class="w-4 h-4"></i>
                                 </span>
                             </div>
@@ -254,17 +286,17 @@
                     <!-- Slide 2: 305 Week Card -->
                     <div data-carousel-slide="2" onclick="openWeeklyModal('305')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-purple-50/70 rounded-2xl border border-purple-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-purple-400 hover:shadow-md transition">
                         <div onclick="event.stopPropagation()">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-1.5">
-                                    <button onclick="changeWeeklyOffset('305', -1)" title="Previous Week" class="w-6 h-6 rounded-lg bg-purple-100 hover:bg-purple-200 text-purple-800 flex items-center justify-center transition cursor-pointer">
-                                        <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+                            <div class="flex items-center justify-between gap-1.5">
+                                <div class="flex items-center gap-1.5 min-w-0">
+                                    <button type="button" onclick="changeWeeklyOffset('305', -1)" title="Previous Week" class="w-7 h-7 sm:w-6 sm:h-6 rounded-lg bg-purple-100 hover:bg-purple-200 active:bg-purple-300 text-purple-800 flex items-center justify-center transition cursor-pointer shrink-0">
+                                        <i data-lucide="chevron-left" class="w-4 h-4 sm:w-3.5 sm:h-3.5"></i>
                                     </button>
-                                    <span id="stat305WeekTitle" class="text-xs font-bold uppercase tracking-wider text-purple-900">305 Week —</span>
-                                    <button id="nextBtn305" onclick="changeWeeklyOffset('305', 1)" title="Next Week" class="w-6 h-6 rounded-lg bg-purple-100 hover:bg-purple-200 text-purple-800 flex items-center justify-center transition cursor-pointer">
-                                        <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                    <span id="stat305WeekTitle" class="text-xs font-bold uppercase tracking-wider text-purple-900 truncate">305 Week —</span>
+                                    <button type="button" id="nextBtn305" onclick="changeWeeklyOffset('305', 1)" title="Next Week" class="w-7 h-7 sm:w-6 sm:h-6 rounded-lg bg-purple-100 hover:bg-purple-200 active:bg-purple-300 text-purple-800 flex items-center justify-center transition cursor-pointer shrink-0">
+                                        <i data-lucide="chevron-right" class="w-4 h-4 sm:w-3.5 sm:h-3.5"></i>
                                     </button>
                                 </div>
-                                <span class="w-8 h-8 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center">
+                                <span class="w-8 h-8 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center shrink-0">
                                     <i data-lucide="book-open-check" class="w-4 h-4"></i>
                                 </span>
                             </div>
@@ -284,41 +316,8 @@
                         </div>
                     </div>
 
-                    <!-- Slide 3: Bautisado Card (Standalone) -->
-                    <div data-carousel-slide="3" onclick="openBaptismModal('ALL')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-sky-50/80 rounded-2xl border border-sky-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-sky-400 hover:shadow-md transition">
-                        <div onclick="event.stopPropagation()">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-1.5">
-                                    <button id="prevBtnBaptism" onclick="changeBaptismYear(-1)" title="Previous Year" class="w-6 h-6 rounded-lg bg-sky-100 hover:bg-sky-200 text-sky-800 flex items-center justify-center transition cursor-pointer">
-                                        <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
-                                    </button>
-                                    <span id="statBaptismYearTitle" class="text-xs font-bold uppercase tracking-wider text-sky-900">Bautisado 2026</span>
-                                    <button id="nextBtnBaptism" onclick="changeBaptismYear(1)" title="Next Year" class="w-6 h-6 rounded-lg bg-sky-100 hover:bg-sky-200 text-sky-800 flex items-center justify-center transition cursor-pointer">
-                                        <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-                                    </button>
-                                </div>
-                                <span class="w-8 h-8 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center">
-                                    <i data-lucide="droplets" class="w-4 h-4"></i>
-                                </span>
-                            </div>
-                            <div class="mt-2 flex items-baseline gap-2">
-                                <span id="statBaptismPct" class="text-2xl font-extrabold text-slate-900">0%</span>
-                                <span id="statBaptismDetails" class="text-xs text-slate-500 font-semibold">0 / 0 overall</span>
-                            </div>
-                        </div>
-                        <div class="mt-2.5 pt-2 border-t border-sky-100">
-                            <div class="flex items-center justify-between mb-1.5">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-sky-800">Purok w/ Bautisado:</span>
-                                <span class="text-[9px] text-slate-400 italic">Click Purok or card to view</span>
-                            </div>
-                            <div id="statBaptismPuroks" class="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto pr-0.5">
-                                <span class="text-[11px] text-slate-400 italic">None for this year</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Slide 4: WEEKS (Absent-Badge Members Standalone Card) -->
-                    <div data-carousel-slide="4" onclick="openWeeklyModal('ABSENT_WEEKS')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-red-50/70 rounded-2xl border border-red-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-red-400 hover:shadow-md transition">
+                    <!-- Slide 3: WEEKS (Absent-Badge Members Standalone Card) -->
+                    <div data-carousel-slide="3" onclick="openWeeklyModal('ABSENT_WEEKS')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-red-50/70 rounded-2xl border border-red-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-red-400 hover:shadow-md transition">
                         <div>
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-extrabold uppercase tracking-wider text-red-900">WEEKS (Absent Badges)</span>
@@ -342,17 +341,17 @@
                         </div>
                     </div>
 
-                    <!-- Slide 5: EF Week Card -->
-                    <div data-carousel-slide="5" onclick="openSummaryCardModal('EF_WEEK')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-emerald-50/80 rounded-2xl border border-emerald-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-emerald-400 hover:shadow-md transition">
+                    <!-- Slide 4: EF Week Card -->
+                    <div data-carousel-slide="4" onclick="openSummaryCardModal('EF_WEEK')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-emerald-50/80 rounded-2xl border border-emerald-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-emerald-400 hover:shadow-md transition">
                         <div onclick="event.stopPropagation()">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-1.5">
-                                    <button type="button" onclick="changeWeeklyOffset('EF', -1)" title="Previous Week" class="w-6 h-6 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 flex items-center justify-center transition cursor-pointer">
-                                        <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+                            <div class="flex items-center justify-between gap-1.5">
+                                <div class="flex items-center gap-1.5 min-w-0">
+                                    <button type="button" onclick="changeWeeklyOffset('EF', -1)" title="Previous Week" class="w-7 h-7 sm:w-6 sm:h-6 rounded-lg bg-emerald-100 hover:bg-emerald-200 active:bg-emerald-300 text-emerald-800 flex items-center justify-center transition cursor-pointer shrink-0">
+                                        <i data-lucide="chevron-left" class="w-4 h-4 sm:w-3.5 sm:h-3.5"></i>
                                     </button>
-                                    <span id="statEfWeekTitle" class="text-xs font-bold uppercase tracking-wider text-emerald-900">EF Week —</span>
-                                    <button type="button" id="nextBtnEF" onclick="changeWeeklyOffset('EF', 1)" title="Next Week" class="w-6 h-6 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 flex items-center justify-center transition cursor-pointer">
-                                        <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                    <span id="statEfWeekTitle" class="text-xs font-bold uppercase tracking-wider text-emerald-900 truncate">EF Week —</span>
+                                    <button type="button" id="nextBtnEF" onclick="changeWeeklyOffset('EF', 1)" title="Next Week" class="w-7 h-7 sm:w-6 sm:h-6 rounded-lg bg-emerald-100 hover:bg-emerald-200 active:bg-emerald-300 text-emerald-800 flex items-center justify-center transition cursor-pointer shrink-0">
+                                        <i data-lucide="chevron-right" class="w-4 h-4 sm:w-3.5 sm:h-3.5"></i>
                                     </button>
                                 </div>
                                 <span class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
@@ -375,17 +374,17 @@
                         </div>
                     </div>
 
-                    <!-- Slide 6: 304 Approved (304 Week) Card -->
-                    <div data-carousel-slide="6" onclick="openSummaryCardModal('W304_WEEK')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-violet-50/80 rounded-2xl border border-violet-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-violet-400 hover:shadow-md transition">
+                    <!-- Slide 5: 304 Approved (304 Week) Card -->
+                    <div data-carousel-slide="5" onclick="openSummaryCardModal('W304_WEEK')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-violet-50/80 rounded-2xl border border-violet-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-violet-400 hover:shadow-md transition">
                         <div onclick="event.stopPropagation()">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-1.5">
-                                    <button type="button" onclick="changeWeeklyOffset('304', -1)" title="Previous Week" class="w-6 h-6 rounded-lg bg-violet-100 hover:bg-violet-200 text-violet-800 flex items-center justify-center transition cursor-pointer">
-                                        <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+                            <div class="flex items-center justify-between gap-1.5">
+                                <div class="flex items-center gap-1.5 min-w-0">
+                                    <button type="button" onclick="changeWeeklyOffset('304', -1)" title="Previous Week" class="w-7 h-7 sm:w-6 sm:h-6 rounded-lg bg-violet-100 hover:bg-violet-200 active:bg-violet-300 text-violet-800 flex items-center justify-center transition cursor-pointer shrink-0">
+                                        <i data-lucide="chevron-left" class="w-4 h-4 sm:w-3.5 sm:h-3.5"></i>
                                     </button>
-                                    <span id="stat304WeekTitle" class="text-xs font-bold uppercase tracking-wider text-violet-900">304 Approved • Week —</span>
-                                    <button type="button" id="nextBtn304" onclick="changeWeeklyOffset('304', 1)" title="Next Week" class="w-6 h-6 rounded-lg bg-violet-100 hover:bg-violet-200 text-violet-800 flex items-center justify-center transition cursor-pointer">
-                                        <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                    <span id="stat304WeekTitle" class="text-xs font-bold uppercase tracking-wider text-violet-900 truncate">304 Approved • Week —</span>
+                                    <button type="button" id="nextBtn304" onclick="changeWeeklyOffset('304', 1)" title="Next Week" class="w-7 h-7 sm:w-6 sm:h-6 rounded-lg bg-violet-100 hover:bg-violet-200 active:bg-violet-300 text-violet-800 flex items-center justify-center transition cursor-pointer shrink-0">
+                                        <i data-lucide="chevron-right" class="w-4 h-4 sm:w-3.5 sm:h-3.5"></i>
                                     </button>
                                 </div>
                                 <span class="w-8 h-8 rounded-lg bg-violet-100 text-violet-700 flex items-center justify-center shrink-0">
@@ -408,8 +407,8 @@
                         </div>
                     </div>
 
-                    <!-- Slide 7: Baptism: On hold -->
-                    <div data-carousel-slide="7" onclick="openSummaryCardModal('BAPTISM_ON_HOLD')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-amber-50/80 rounded-2xl border border-amber-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-amber-400 hover:shadow-md transition">
+                    <!-- Slide 6: Baptism: On hold -->
+                    <div data-carousel-slide="6" onclick="openSummaryCardModal('BAPTISM_ON_HOLD')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-amber-50/80 rounded-2xl border border-amber-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-amber-400 hover:shadow-md transition">
                         <div>
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold uppercase tracking-wider text-amber-900">Baptism: On hold</span>
@@ -433,8 +432,8 @@
                         </div>
                     </div>
 
-                    <!-- Slide 8: For Final Screening (with MM/DD date) -->
-                    <div data-carousel-slide="8" onclick="openSummaryCardModal('FINAL_SCREENING')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-indigo-50/80 rounded-2xl border border-indigo-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-indigo-400 hover:shadow-md transition">
+                    <!-- Slide 7: For Final Screening (with MM/DD date) -->
+                    <div data-carousel-slide="7" onclick="openSummaryCardModal('FINAL_SCREENING')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-indigo-50/80 rounded-2xl border border-indigo-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-indigo-400 hover:shadow-md transition">
                         <div>
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold uppercase tracking-wider text-indigo-900">For Final Screening</span>
@@ -458,8 +457,8 @@
                         </div>
                     </div>
 
-                    <!-- Slide 9: Baptism: Pending -->
-                    <div data-carousel-slide="9" onclick="openSummaryCardModal('BAPTISM_PENDING')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-sky-50/80 rounded-2xl border border-sky-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-sky-400 hover:shadow-md transition">
+                    <!-- Slide 8: Baptism: Pending -->
+                    <div data-carousel-slide="8" onclick="openSummaryCardModal('BAPTISM_PENDING')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-sky-50/80 rounded-2xl border border-sky-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-sky-400 hover:shadow-md transition">
                         <div>
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold uppercase tracking-wider text-sky-900">Baptism: Pending</span>
@@ -483,8 +482,8 @@
                         </div>
                     </div>
 
-                    <!-- Slide 10: 304: Pending -->
-                    <div data-carousel-slide="10" onclick="openSummaryCardModal('PENDING_304')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-purple-50/80 rounded-2xl border border-purple-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-purple-400 hover:shadow-md transition">
+                    <!-- Slide 9: 304: Pending -->
+                    <div data-carousel-slide="9" onclick="openSummaryCardModal('PENDING_304')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-purple-50/80 rounded-2xl border border-purple-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-purple-400 hover:shadow-md transition">
                         <div>
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold uppercase tracking-wider text-purple-900">304: Pending</span>
@@ -508,8 +507,8 @@
                         </div>
                     </div>
 
-                    <!-- Slide 11: EF: Pending -->
-                    <div data-carousel-slide="11" onclick="openSummaryCardModal('EF_PENDING')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-teal-50/80 rounded-2xl border border-teal-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-teal-400 hover:shadow-md transition">
+                    <!-- Slide 10: EF: Pending -->
+                    <div data-carousel-slide="10" onclick="openSummaryCardModal('EF_PENDING')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-teal-50/80 rounded-2xl border border-teal-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-teal-400 hover:shadow-md transition">
                         <div>
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold uppercase tracking-wider text-teal-900">EF: Pending</span>
@@ -533,8 +532,8 @@
                         </div>
                     </div>
 
-                    <!-- Slide 12: For ≤304 -->
-                    <div data-carousel-slide="12" onclick="openSummaryCardModal('FOR_304')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-cyan-50/80 rounded-2xl border border-cyan-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-cyan-400 hover:shadow-md transition">
+                    <!-- Slide 11: For ≤304 -->
+                    <div data-carousel-slide="11" onclick="openSummaryCardModal('FOR_304')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-cyan-50/80 rounded-2xl border border-cyan-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-cyan-400 hover:shadow-md transition">
                         <div>
                             <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold uppercase tracking-wider text-cyan-900">For ≤304</span>
@@ -777,7 +776,7 @@
 
                 <div>
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">Remarks / Notes</label>
-                    <textarea id="inputNotes" rows="2" placeholder="Add any specific remarks or notes..." class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:bg-white"></textarea>
+                    <textarea id="inputNotes" rows="3" onkeydown="handleRemarksKeydown(event)" placeholder="Add any specific remarks or notes... (Shift+Enter for next line)" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:bg-white whitespace-pre-wrap"></textarea>
                 </div>
 
                 <!-- Member Picture & QR Code Uploads -->
@@ -1139,7 +1138,7 @@
             <form onsubmit="saveQuickNotes(event)" class="p-6 space-y-4">
                 <div>
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Remarks / Notes</label>
-                    <textarea id="quickNotesTextarea" rows="4" placeholder="Ilagay dito ang remarks o notes..." class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:bg-white"></textarea>
+                    <textarea id="quickNotesTextarea" rows="4" onkeydown="handleRemarksKeydown(event)" placeholder="Ilagay dito ang remarks o notes... (Shift+Enter para sa next line)" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:bg-white whitespace-pre-wrap"></textarea>
                 </div>
                 <div class="flex items-center justify-between gap-2 pt-1">
                     <button type="button" onclick="clearQuickNotes()" class="admin-only px-3.5 py-2 rounded-xl border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-bold transition cursor-pointer">Clear Notes</button>
@@ -1342,7 +1341,7 @@
         let weekOffsetEF = 0;
         let weekOffset304 = 0;
         let activeSummarySlideIndex = 0;
-        const TOTAL_SUMMARY_SLIDES = 13;
+        const TOTAL_SUMMARY_SLIDES = 12;
         let selectedBaptismYear = new Date().getFullYear();
         let activeBaptismModalPurok = 'ALL';
         let activeSummaryCardModalType = null;
@@ -3318,7 +3317,7 @@
                 missingNamesElId: 'stat305MissingNames'
             });
 
-            // Helper to render clickable member rows for the new summary carousel cards
+            // Helper to render clickable member rows for the summary carousel cards
             const renderMemberRowList = (containerId, items, emptyText, rightBadgeFn) => {
                 const el = document.getElementById(containerId);
                 if (!el) return;
@@ -3342,7 +3341,7 @@
                 }).join('');
             };
 
-            // Card 6 (Slide 5): EF Week
+            // Slide 4: EF Week
             const targetWeekEF = Math.max(1, currentWeekNum + weekOffsetEF);
             const efTitleEl = document.getElementById('statEfWeekTitle');
             const efCountEl = document.getElementById('statEfWeekCount');
@@ -3367,7 +3366,7 @@
                 m => m.efRef ? `<span class="text-[9px] font-bold px-1.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">${escapeHtml(m.efRef)}</span>` : ''
             );
 
-            // Card 7 (Slide 6): 304 Approved (304 Week)
+            // Slide 5: 304 Approved (304 Week)
             const targetWeek304 = Math.max(1, currentWeekNum + weekOffset304);
             const w304TitleEl = document.getElementById('stat304WeekTitle');
             const w304CountEl = document.getElementById('stat304WeekCount');
@@ -3392,13 +3391,13 @@
                 m => m.ref304 ? `<span class="text-[9px] font-bold px-1.5 rounded bg-violet-100 text-violet-800 border border-violet-200">${escapeHtml(m.ref304)}</span>` : ''
             );
 
-            // Card 8 (Slide 7): Baptism: On hold
+            // Slide 6: Baptism: On hold
             const listBaptismOnHold = scopeMembers.filter(m => isMemberForBaptism(m) && (m.baptismStatus || 'Pending') === 'On-hold');
             const elOnHoldCount = document.getElementById('statCardBaptismOnHoldCount');
             if (elOnHoldCount) elOnHoldCount.textContent = listBaptismOnHold.length;
             renderMemberRowList('statCardBaptismOnHoldList', listBaptismOnHold, 'None on hold');
 
-            // Card 9 (Slide 8): For Final Screening (with MM/DD from baptismDate)
+            // Slide 7: For Final Screening (with MM/DD from baptismDate)
             const listFinalScreening = scopeMembers.filter(m => isMemberForBaptism(m) && (m.baptismStatus || 'Pending') === 'For Final Screening');
             const elFinalScrCount = document.getElementById('statCardFinalScreeningCount');
             if (elFinalScrCount) elFinalScrCount.textContent = listFinalScreening.length;
@@ -3414,13 +3413,13 @@
                 }
             );
 
-            // Card 10 (Slide 9): Baptism: Pending
+            // Slide 8: Baptism: Pending
             const listBaptismPending = scopeMembers.filter(m => isMemberForBaptism(m) && (m.baptismStatus || 'Pending') === 'Pending');
             const elBaptPendingCount = document.getElementById('statCardBaptismPendingCount');
             if (elBaptPendingCount) elBaptPendingCount.textContent = listBaptismPending.length;
             renderMemberRowList('statCardBaptismPendingList', listBaptismPending, 'None pending');
 
-            // Card 11 (Slide 10): 304: Pending
+            // Slide 9: 304: Pending
             const list304Pending = scopeMembers.filter(m => {
                 const l303 = Math.min(30, Object.keys(getL303Map(m)).length);
                 return l303 >= 30 && (m.status304 || 'Pending') === 'Pending';
@@ -3429,13 +3428,13 @@
             if (el304PendingCount) el304PendingCount.textContent = list304Pending.length;
             renderMemberRowList('statCard304PendingList', list304Pending, 'None pending');
 
-            // Card 12 (Slide 11): EF: Pending
+            // Slide 10: EF: Pending
             const listEfPending = scopeMembers.filter(m => (m.efStatus || 'Approved') === 'Pending');
             const elEfPendingCount = document.getElementById('statCardEfPendingCount');
             if (elEfPendingCount) elEfPendingCount.textContent = listEfPending.length;
             renderMemberRowList('statCardEfPendingList', listEfPending, 'None pending');
 
-            // Card 13 (Slide 12): For <=304 (<=5 lessons left in 303 & 304 not Approved)
+            // Slide 11: For <=304 (<=5 lessons left in 303 & 304 not Approved)
             const listFor304 = scopeMembers.filter(m => isMemberForPreScreening(m));
             const elFor304Count = document.getElementById('statCardFor304Count');
             if (elFor304Count) elFor304Count.textContent = listFor304.length;
@@ -3470,10 +3469,8 @@
             const byYear = normalizeMemberC309Structure(member);
             const yearWeeks = byYear[currentYr] || {};
 
-            // Determine the first week in currentYr where 309 attendance is expected
             let startWeek = null;
 
-            // 1. Check 309 'Approved' anchor
             const anchor = get309ApprovedAnchor(member);
             if (anchor) {
                 if (anchor.year < currentYr) {
@@ -3485,7 +3482,6 @@
                 }
             }
 
-            // 2. Check EF Approved Week + 1 if anchor wasn't set
             if (startWeek === null) {
                 const efStatus = member.efStatus || 'Approved';
                 const efWk = extractWeekNumber(member.efRef || '');
@@ -3494,7 +3490,6 @@
                 }
             }
 
-            // 3. Also check earliest week with any recorded 309 attendance in currentYr (or prior years)
             let earliestLoggedWeek = null;
             Object.keys(byYear).forEach(yrKey => {
                 const yrNum = Number(yrKey);
@@ -3526,7 +3521,6 @@
                 const status = get309WeekServiceStatus(member, w);
                 const isApprovedSlot = slot.mw === 'Approved' || slot.we === 'Approved';
 
-                // If present in either MW or WE (or marked Approved), the consecutive absent streak stops
                 if (status.hasAny || isApprovedSlot) {
                     break;
                 }
@@ -3767,106 +3761,94 @@
                                                 <i data-lucide="droplets" class="w-2.5 h-2.5"></i> For Baptism
                                             </span>
                                         ` : ''}
-                                        ${isTigilDone ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-rose-700 text-white border border-rose-800">Tigil: Approved</span>` : ''}
-                                        ${inactive ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-100 text-rose-700 border border-rose-200">Inactive (2w+)</span>` : ''}
-                                    </div>
-                                    <h3 class="text-base font-extrabold text-slate-900 leading-snug break-words mt-1">${escapeHtml(member.fullName)}</h3>
-                                    <div class="flex items-center gap-1.5 flex-wrap mt-1">
-                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold border ${efBadgeClass}">
-                                            EF: ${escapeHtml(efStatus)}${member.efRef ? ` (${escapeHtml(member.efRef)})` : ''}
+                                        ${isTigilDone ? `
+                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-rose-600 text-white border border-rose-700 shadow-2xs">
+                                                <i data-lucide="pause-circle" class="w-2.5 h-2.5"></i> Tigil: Approved
+                                            </span>
+                                        ` : ''}
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold border ${inactive ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}">
+                                            <span class="w-1.5 h-1.5 rounded-full ${inactive ? 'bg-rose-500' : 'bg-emerald-500'}"></span>
+                                            ${inactive ? 'Inactive' : 'Active'}
                                         </span>
-                                        ${isSinusubok ? `
-                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold border ${badge304Class}">
-                                                304: ${escapeHtml(status304)}${member.ref304 ? ` (${escapeHtml(member.ref304)})` : ''}
-                                            </span>
-                                        ` : ''}
-                                        ${forBaptism ? `
-                                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-semibold border ${badgeBaptismClass}">
-                                                Baptism: ${escapeHtml(baptismStatus)}
-                                            </span>
-                                        ` : ''}
                                     </div>
-                                </div>
-
-                                ${member.qrCode ? `
-                                    <div class="shrink-0">
-                                        <button type="button" onclick="openQrModal('${member.id}')" title="View QR Code" class="w-11 h-11 rounded-xl border border-slate-200 bg-slate-50 p-1 overflow-hidden hover:border-indigo-400 transition cursor-pointer flex items-center justify-center">
-                                            <img src="${member.qrCode}" alt="QR" class="w-full h-full object-contain">
+                                    <h3 class="text-sm sm:text-base font-extrabold text-slate-900 mt-1 break-words leading-snug">${escapeHtml(member.fullName)}</h3>
+                                    <div class="flex items-center gap-1.5 mt-1 flex-wrap">
+                                        <span class="px-2 py-0.5 rounded-md text-[10px] font-bold border ${efBadgeClass}">EF: ${escapeHtml(efStatus)}${member.efRef ? ` (${escapeHtml(member.efRef)})` : ''}</span>
+                                        ${isSinusubok ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-bold border ${badge304Class}">304: ${escapeHtml(status304)}${member.ref304 ? ` (${escapeHtml(member.ref304)})` : ''}</span>` : ''}
+                                        ${forBaptism ? `<span class="px-2 py-0.5 rounded-md text-[10px] font-extrabold border ${badgeBaptismClass}">Baptism: ${escapeHtml(baptismStatus)}</span>` : ''}
+                                    </div>
+                                    ${member.notes ? `
+                                        <div onclick="openNotesModal('${member.id}')" class="mt-1.5 text-[11px] font-extrabold text-slate-900 bg-amber-50 border border-amber-200 hover:bg-amber-100 rounded-lg px-2.5 py-1.5 transition cursor-pointer flex items-start justify-between gap-1.5" title="View Remarks / Notes">
+                                            <div class="whitespace-pre-wrap break-words leading-relaxed flex-1">${formatMultilineText(member.notes)}</div>
+                                            <i data-lucide="pencil" class="admin-only w-3 h-3 text-amber-700 shrink-0 mt-0.5"></i>
+                                        </div>
+                                    ` : `
+                                        <button type="button" onclick="openNotesModal('${member.id}')" class="admin-only mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold text-slate-500 hover:text-amber-700 hover:bg-amber-50 px-2 py-0.5 rounded-md border border-dashed border-slate-300 transition cursor-pointer">
+                                            <i data-lucide="plus" class="w-3 h-3"></i> Add Remarks
                                         </button>
-                                    </div>
-                                ` : ''}
+                                    `}
+                                </div>
                             </div>
 
-                            <!-- 2. COMPACT Progress Bars + Progress Button at Bottom -->
-                            <div class="w-full lg:w-36 shrink-0 bg-slate-50/90 rounded-xl p-2.5 border border-slate-200/80 flex flex-col justify-between space-y-2">
-                                <div class="space-y-1.5">
-                                    <div>
-                                        <div class="flex items-center justify-between text-[11px] mb-0.5">
-                                            <span class="font-extrabold text-slate-700">303</span>
-                                            <span class="font-extrabold text-blue-700">${l303Count}/30</span>
+                            <!-- 2. COMPACT Progress Bars + Actions -->
+                            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 lg:w-[56%]">
+                                <div class="flex-1 grid grid-cols-3 gap-1.5">
+                                    <div onclick="openProgressModal('${member.id}', 'l303')" class="bg-slate-50 hover:bg-indigo-50/70 border border-slate-200 hover:border-indigo-300 rounded-xl px-2 py-2 cursor-pointer transition flex flex-col justify-between">
+                                        <div class="flex items-center justify-between gap-1 text-[10px] font-bold text-slate-700">
+                                            <span class="truncate">303</span>
+                                            <span class="text-indigo-700 shrink-0">${l303Count}/30</span>
                                         </div>
-                                        <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                                            <div class="h-full bg-blue-600 rounded-full transition-all" style="width: ${pct303}%"></div>
+                                        <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden my-1.5">
+                                            <div class="h-full bg-indigo-600 rounded-full" style="width: ${pct303}%"></div>
                                         </div>
-                                    </div>
-                                    <div>
-                                        <div class="flex items-center justify-between text-[11px] mb-0.5">
-                                            <span class="font-extrabold text-slate-700 inline-flex items-center gap-0.5">
-                                                305
-                                                ${!isSinusubok ? '<i data-lucide="lock" class="w-2.5 h-2.5 text-slate-400 shrink-0"></i>' : ''}
-                                            </span>
-                                            <span class="font-extrabold ${isSinusubok ? 'text-purple-700' : 'text-slate-400'}">
-                                                ${isSinusubok ? `${l305Count}/15` : 'Locked'}
-                                            </span>
-                                        </div>
-                                        <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                                            <div class="h-full bg-purple-600 rounded-full transition-all" style="width: ${isSinusubok ? pct305 : 0}%"></div>
+                                        <div class="text-[9px] text-slate-500 flex items-center justify-between">
+                                            <span>${pct303}%</span>
+                                            <span class="text-indigo-600 font-bold">View</span>
                                         </div>
                                     </div>
-                                    <div>
-                                        <div class="flex items-center justify-between text-[11px] mb-0.5">
-                                            <span class="font-extrabold text-slate-700">309</span>
-                                            <span class="font-extrabold text-emerald-700">${c309Count}/48</span>
+
+                                    <div onclick="openProgressModal('${member.id}', 'l305')" class="bg-slate-50 ${isSinusubok ? 'hover:bg-purple-50/70 hover:border-purple-300 cursor-pointer' : 'opacity-65 cursor-pointer'} border border-slate-200 rounded-xl px-2 py-2 transition flex flex-col justify-between">
+                                        <div class="flex items-center justify-between gap-1 text-[10px] font-bold text-slate-700">
+                                            <span class="flex items-center gap-0.5 truncate">305 ${!isSinusubok ? '<i data-lucide="lock" class="w-2.5 h-2.5 text-slate-400"></i>' : ''}</span>
+                                            <span class="text-purple-700 shrink-0">${l305Count}/15</span>
                                         </div>
-                                        <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                                            <div class="h-full bg-emerald-500 rounded-full transition-all" style="width: ${pct309}%"></div>
+                                        <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden my-1.5">
+                                            <div class="h-full bg-purple-600 rounded-full" style="width: ${pct305}%"></div>
+                                        </div>
+                                        <div class="text-[9px] text-slate-500 flex items-center justify-between">
+                                            <span>${isSinusubok ? `${pct305}%` : 'Locked'}</span>
+                                            <span class="text-purple-600 font-bold">${isSinusubok ? 'View' : '303'}</span>
+                                        </div>
+                                    </div>
+
+                                    <div onclick="openProgressModal('${member.id}', 'c309')" class="bg-slate-50 hover:bg-emerald-50/70 border border-slate-200 hover:border-emerald-300 rounded-xl px-2 py-2 cursor-pointer transition flex flex-col justify-between">
+                                        <div class="flex items-center justify-between gap-1 text-[10px] font-bold text-slate-700">
+                                            <span class="truncate">309</span>
+                                            <span class="text-emerald-700 shrink-0">${c309Count}/48</span>
+                                        </div>
+                                        <div class="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden my-1.5">
+                                            <div class="h-full bg-emerald-600 rounded-full" style="width: ${pct309}%"></div>
+                                        </div>
+                                        <div class="text-[9px] text-slate-500 flex items-center justify-between">
+                                            <span>${pct309}%</span>
+                                            <span class="text-emerald-600 font-bold">View</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <button type="button" onclick="openProgressModal('${member.id}')" class="w-full inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[11px] shadow-2xs transition cursor-pointer">
-                                    <i data-lucide="calendar-check" class="w-3 h-3"></i>
-                                    <span>Progress</span>
-                                </button>
-                            </div>
-
-                            <!-- 3. Remarks / Notes & Admin Edit/Delete Actions -->
-                            <div class="flex-1 flex items-stretch gap-2 min-w-0">
-                                <button type="button" onclick="openNotesModal('${member.id}')" title="Click to view/edit Remarks / Notes" class="flex-1 text-left rounded-xl p-2.5 border transition cursor-pointer flex flex-col justify-between min-h-[82px] ${
-                                    member.notes && member.notes.trim()
-                                        ? 'bg-amber-50/70 hover:bg-amber-100/70 border-amber-200/90'
-                                        : 'bg-slate-50/70 hover:bg-slate-100/80 border-dashed border-slate-300'
-                                }">
-                                    <div class="flex items-center justify-between gap-1 w-full mb-1">
-                                        <span class="text-[10px] font-extrabold uppercase tracking-wider ${member.notes && member.notes.trim() ? 'text-amber-800' : 'text-slate-400'} inline-flex items-center gap-1">
-                                            <i data-lucide="sticky-note" class="w-3 h-3 ${member.notes && member.notes.trim() ? 'text-amber-600' : 'text-slate-400'}"></i>
-                                            Remarks / Notes
-                                        </span>
-                                        <span class="text-[9px] font-bold text-indigo-600 inline-flex items-center gap-0.5 shrink-0">
-                                            <i data-lucide="eye" class="w-2.5 h-2.5"></i> View
-                                        </span>
-                                    </div>
-                                    ${member.notes && member.notes.trim()
-                                        ? `<p class="text-xs font-bold text-slate-900 whitespace-pre-wrap break-words leading-snug w-full">${escapeHtml(member.notes)}</p>`
-                                        : `<p class="text-[11px] font-medium text-slate-400 italic leading-snug">No remarks added yet...</p>`
-                                    }
-                                </button>
-
-                                <div class="admin-only flex-col justify-center gap-1.5 shrink-0">
-                                    <button type="button" onclick="openEditModal('${member.id}')" title="Edit Member" class="p-2 rounded-xl text-slate-500 hover:text-indigo-600 hover:bg-slate-100 border border-slate-200/80 transition cursor-pointer">
-                                        <i data-lucide="pencil" class="w-4 h-4"></i>
+                                <!-- Compact Action Buttons -->
+                                <div class="flex items-center justify-end gap-1.5 shrink-0">
+                                    <button type="button" onclick="openProgressModal('${member.id}')" title="Open Progress Dates" class="inline-flex items-center gap-1 px-2.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition cursor-pointer shadow-2xs">
+                                        <i data-lucide="calendar-check" class="w-3.5 h-3.5"></i>
+                                        <span class="hidden xl:inline">Dates</span>
                                     </button>
-                                    <button type="button" onclick="openDeleteModal('${member.id}')" title="Delete Member" class="p-2 rounded-xl text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-slate-200/80 transition cursor-pointer">
+                                    <button type="button" onclick="openQrModal('${member.id}')" title="Member QR Code" class="p-2 rounded-xl border ${member.qrCode ? 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100' : 'border-slate-200 bg-white text-slate-500 hover:bg-slate-100'} transition cursor-pointer">
+                                        <i data-lucide="qr-code" class="w-4 h-4"></i>
+                                    </button>
+                                    <button type="button" onclick="openEditModal('${member.id}')" title="Edit Profile" class="admin-only p-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100 transition cursor-pointer">
+                                        <i data-lucide="edit-2" class="w-4 h-4"></i>
+                                    </button>
+                                    <button type="button" onclick="openDeleteModal('${member.id}')" title="Delete Record" class="admin-only p-2 rounded-xl border border-slate-200 text-rose-600 hover:bg-rose-50 transition cursor-pointer">
                                         <i data-lucide="trash-2" class="w-4 h-4"></i>
                                     </button>
                                 </div>
@@ -3876,66 +3858,100 @@
                 `;
             }).join('');
 
-            // Render Pagination Controls
+            // Render Pagination Bar
             if (paginationContainer) {
-                if (totalPages > 1) {
-                    paginationContainer.classList.remove('hidden');
-                    paginationContainer.classList.add('flex');
+                const infoEl = document.getElementById('paginationInfo');
+                const controlsEl = document.getElementById('paginationControls');
 
-                    document.getElementById('paginationInfo').textContent = `Showing ${startIndex + 1}–${endIndex} of ${totalItems} members (Page ${currentPage} of ${totalPages})`;
+                paginationContainer.classList.remove('hidden');
+                paginationContainer.classList.add('flex');
 
-                    let controlsHtml = `
-                        <button type="button" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:pointer-events-none transition cursor-pointer flex items-center gap-1">
+                if (infoEl) {
+                    infoEl.textContent = `Showing ${startIndex + 1}–${endIndex} of ${totalItems} members (Page ${currentPage} of ${totalPages})`;
+                }
+
+                if (controlsEl) {
+                    let buttonsHtml = '';
+                    buttonsHtml += `
+                        <button type="button" onclick="goToPage(${currentPage - 1})" ${currentPage <= 1 ? 'disabled' : ''} class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:pointer-events-none transition cursor-pointer flex items-center gap-1">
                             <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i> Prev
                         </button>
                     `;
 
-                    for (let p = 1; p <= totalPages; p++) {
-                        if (p === 1 || p === totalPages || (p >= currentPage - 1 && p <= currentPage + 1)) {
-                            controlsHtml += `
-                                <button type="button" onclick="goToPage(${p})" class="w-8 h-8 rounded-xl text-xs font-extrabold transition cursor-pointer ${
-                                    p === currentPage
-                                        ? 'bg-indigo-600 text-white shadow-xs'
-                                        : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
-                                }">
-                                    ${p}
-                                </button>
-                            `;
-                        } else if (p === currentPage - 2 || p === currentPage + 2) {
-                            controlsHtml += `<span class="px-1 text-slate-400 text-xs font-bold">...</span>`;
-                        }
+                    const maxVisiblePages = 5;
+                    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+                    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+                    if (endPage - startPage + 1 < maxVisiblePages) {
+                        startPage = Math.max(1, endPage - maxVisiblePages + 1);
                     }
 
-                    controlsHtml += `
-                        <button type="button" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} class="px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:pointer-events-none transition cursor-pointer flex items-center gap-1">
+                    if (startPage > 1) {
+                        buttonsHtml += `<button type="button" onclick="goToPage(1)" class="w-8 h-8 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer">1</button>`;
+                        if (startPage > 2) buttonsHtml += `<span class="px-1 text-slate-400 text-xs font-bold">...</span>`;
+                    }
+
+                    for (let p = startPage; p <= endPage; p++) {
+                        const isCurrent = p === currentPage;
+                        buttonsHtml += `
+                            <button type="button" onclick="goToPage(${p})" class="w-8 h-8 rounded-xl border text-xs font-extrabold transition cursor-pointer ${
+                                isCurrent ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs' : 'border-slate-200 text-slate-700 hover:bg-slate-100'
+                            }">${p}</button>
+                        `;
+                    }
+
+                    if (endPage < totalPages) {
+                        if (endPage < totalPages - 1) buttonsHtml += `<span class="px-1 text-slate-400 text-xs font-bold">...</span>`;
+                        buttonsHtml += `<button type="button" onclick="goToPage(${totalPages})" class="w-8 h-8 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer">${totalPages}</button>`;
+                    }
+
+                    buttonsHtml += `
+                        <button type="button" onclick="goToPage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''} class="px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:pointer-events-none transition cursor-pointer flex items-center gap-1">
                             Next <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
                         </button>
                     `;
 
-                    document.getElementById('paginationControls').innerHTML = controlsHtml;
-                } else {
-                    paginationContainer.classList.add('hidden');
-                    paginationContainer.classList.remove('flex');
+                    controlsEl.innerHTML = buttonsHtml;
                 }
             }
 
             lucide.createIcons();
         }
 
-        function openNotesModal(memberId) {
-            const member = members.find(m => m.id === memberId);
-            if (!member) return;
-            activeNotesMemberId = memberId;
-            document.getElementById('notesModalName').textContent = member.fullName || 'Remarks / Notes';
-            document.getElementById('notesModalSub').textContent = `${member.purok || ''} — ${member.purokGrupo || ''}`;
+        // Quick Notes Modal
+        function handleRemarksKeydown(event) {
+            if (event.key === 'Enter') {
+                // Prevent accidental form submission on Enter or Shift+Enter inside Remarks textarea
+                event.stopPropagation();
+            }
+        }
+
+        function normalizeRemarksText(rawText) {
+            if (rawText === null || rawText === undefined) return '';
+            // Normalize CRLF/CR to LF and trim only leading/trailing blank lines/spaces while preserving internal newlines
+            return String(rawText)
+                .replace(/\r\n?/g, '\n')
+                .replace(/^\s+|\s+$/g, '');
+        }
+
+        function formatMultilineText(str) {
+            if (!str) return '';
+            return escapeHtml(String(str).replace(/\r\n?/g, '\n'));
+        }
+
+        function openNotesModal(id) {
+            const m = members.find(x => x.id === id);
+            if (!m) return;
+            activeNotesMemberId = id;
+            document.getElementById('notesModalName').textContent = m.fullName;
+            document.getElementById('notesModalSub').textContent = `${m.purok} • ${m.purokGrupo}`;
             const textarea = document.getElementById('quickNotesTextarea');
-            textarea.value = member.notes || '';
-            textarea.disabled = !isAdmin;
-            
+            textarea.value = (m.notes || '').replace(/\r\n?/g, '\n');
+            textarea.readOnly = !isAdmin;
             const modal = document.getElementById('notesModal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             lucide.createIcons();
+            if (isAdmin) textarea.focus();
         }
 
         function closeNotesModal() {
@@ -3947,113 +3963,33 @@
 
         function saveQuickNotes(event) {
             event.preventDefault();
-            if (!isAdmin || !activeNotesMemberId) return;
-            const idx = members.findIndex(m => m.id === activeNotesMemberId);
-            if (idx !== -1) {
-                members[idx].notes = document.getElementById('quickNotesTextarea').value.trim();
-                members[idx].updatedAt = Date.now();
-                persistMembers();
-                renderMembers();
-                showToast('Remarks / Notes updated!');
-            }
+            if (!isAdmin) return;
+            const m = members.find(x => x.id === activeNotesMemberId);
+            if (!m) return;
+            m.notes = normalizeRemarksText(document.getElementById('quickNotesTextarea').value);
+            m.updatedAt = Date.now();
+            persistMembers(m.id);
+            renderMembers();
             closeNotesModal();
+            showToast('Remarks updated!');
         }
 
         function clearQuickNotes() {
             if (!isAdmin) return;
-            const textarea = document.getElementById('quickNotesTextarea');
-            if (textarea) {
-                textarea.value = '';
-                textarea.focus();
-            }
+            const m = members.find(x => x.id === activeNotesMemberId);
+            if (!m) return;
+            m.notes = '';
+            m.updatedAt = Date.now();
+            persistMembers(m.id);
+            renderMembers();
+            closeNotesModal();
+            showToast('Remarks cleared!');
         }
 
-        function updateForm304Availability(isSinusubok) {
-            const select304 = document.getElementById('input304Approved');
-            const weekSelect304 = document.getElementById('input304WeekSelect');
-            const ref304 = document.getElementById('input304Ref');
-            const badgeLock = document.getElementById('badge304Lock');
-            const hintText = document.getElementById('hint304Text');
-            const container = document.getElementById('field304Container');
-
-            if (isSinusubok) {
-                select304.disabled = !isAdmin;
-                if (weekSelect304) weekSelect304.disabled = !isAdmin;
-                ref304.disabled = !isAdmin;
-                badgeLock.innerHTML = `<i data-lucide="unlock" class="w-2.5 h-2.5"></i> Sinusubok Stage`;
-                badgeLock.className = 'inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-purple-100 text-purple-700 text-[10px] font-bold';
-                hintText.textContent = 'Select Approved Week (e.g. Week 40) — Pulong-Panalangin 305 checking starts on Approved Week + 1.';
-                container.className = 'p-3.5 rounded-xl border border-purple-200 bg-purple-50/40 transition space-y-2.5';
-            } else {
-                select304.disabled = true;
-                if (weekSelect304) weekSelect304.disabled = true;
-                ref304.disabled = true;
-                badgeLock.innerHTML = `<i data-lucide="lock" class="w-2.5 h-2.5"></i> Locked (Doktrina)`;
-                badgeLock.className = 'inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 text-[10px] font-bold';
-                hintText.textContent = 'Available once the member completes Doktrina 303 (30/30) and enters the Sinusubok stage.';
-                container.className = 'p-3.5 rounded-xl border border-slate-200 bg-slate-50 transition space-y-2.5';
-            }
-            lucide.createIcons();
-        }
-
-        function updateFormBaptismAvailability(forBaptism) {
-            const selectBapt = document.getElementById('inputBaptismStatus');
-            const dateHiddenBapt = document.getElementById('inputBaptismDate');
-            const dateTextBapt = document.getElementById('inputBaptismDateText');
-            const badgeLock = document.getElementById('badgeBaptismLock');
-            const hintText = document.getElementById('hintBaptismText');
-            const container = document.getElementById('fieldBaptismContainer');
-
-            if (forBaptism) {
-                if (selectBapt) selectBapt.disabled = !isAdmin;
-                if (dateHiddenBapt) dateHiddenBapt.disabled = !isAdmin;
-                if (dateTextBapt) dateTextBapt.disabled = !isAdmin;
-                if (badgeLock) {
-                    badgeLock.innerHTML = `<i data-lucide="droplets" class="w-2.5 h-2.5"></i> For Baptism`;
-                    badgeLock.className = 'inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-sky-100 text-sky-700 text-[10px] font-bold';
-                }
-                if (hintText) {
-                    hintText.textContent = 'Set Baptism Status to Approved and pick the approval date to archive from active monitoring and record under Bautisado.';
-                }
-                if (container) {
-                    container.className = 'p-3.5 rounded-xl border border-sky-200 bg-sky-50/50 transition space-y-2.5';
-                }
-            } else {
-                if (selectBapt) selectBapt.disabled = true;
-                if (dateHiddenBapt) dateHiddenBapt.disabled = true;
-                if (dateTextBapt) dateTextBapt.disabled = true;
-                if (badgeLock) {
-                    badgeLock.innerHTML = `<i data-lucide="lock" class="w-2.5 h-2.5"></i> Locked (Incomplete)`;
-                    badgeLock.className = 'inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 text-[10px] font-bold';
-                }
-                if (hintText) {
-                    hintText.textContent = 'Available once 303 (30/30), 305 (15/15), and 309 (48/48) are completed.';
-                }
-                if (container) {
-                    container.className = 'p-3.5 rounded-xl border border-slate-200 bg-slate-50 transition space-y-2.5';
-                }
-            }
-            lucide.createIcons();
-        }
-
-        function handleBaptismStatusChange() {
-            const statusVal = document.getElementById('inputBaptismStatus').value;
-            const dateTextEl = document.getElementById('inputBaptismDateText');
-            if (statusVal === 'Approved') {
-                if (dateTextEl) {
-                    dateTextEl.required = true;
-                    dateTextEl.classList.add('border-sky-400', 'ring-2', 'ring-sky-500/20');
-                    dateTextEl.focus();
-                }
-            } else if (dateTextEl) {
-                dateTextEl.required = false;
-                dateTextEl.classList.remove('border-sky-400', 'ring-2', 'ring-sky-500/20');
-            }
-        }
-
+        // Add / Edit Member Modal
         function openAddModal() {
             if (!isAdmin) return;
-            document.getElementById('memberModalTitle').textContent = 'Add New Member';
+            document.getElementById('memberModalTitle').textContent = 'Add Member';
             document.getElementById('editMemberId').value = '';
             document.getElementById('inputFullName').value = '';
             document.getElementById('inputPurok').value = selectedPurok !== 'ALL' ? selectedPurok : 'PUROK 1';
@@ -4062,82 +3998,156 @@
             document.getElementById('inputEfWeekSelect').value = '';
             document.getElementById('inputEfRef').value = '';
             document.getElementById('inputInitial309').value = '0';
-            document.getElementById('input304Approved').value = 'Pending';
-            document.getElementById('input304WeekSelect').value = '';
-            document.getElementById('input304Ref').value = '';
-            document.getElementById('inputBaptismStatus').value = 'Pending';
-            document.getElementById('inputBaptismDate').value = '';
-            document.getElementById('inputBaptismDateText').value = '';
-            document.getElementById('inputTigilStatus').value = 'Pending';
+            document.getElementById('inputInitial309').disabled = false;
             document.getElementById('inputNotes').value = '';
-            removePicFromForm();
+            document.getElementById('inputTigilStatus').value = 'Pending';
+
+            update304FieldState(false, 'Pending', '');
+            updateBaptismFieldState(false, 'Pending', '');
             removeQrFromForm();
-            updateForm304Availability(false);
-            updateFormBaptismAvailability(false);
+            removePicFromForm();
 
             const modal = document.getElementById('memberModal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
+            lucide.createIcons();
+            document.getElementById('inputFullName').focus();
         }
 
-        function openEditModal(memberId) {
+        function openEditModal(id) {
             if (!isAdmin) return;
-            const member = members.find(m => m.id === memberId);
-            if (!member) return;
+            const m = members.find(x => x.id === id);
+            if (!m) return;
 
-            document.getElementById('memberModalTitle').textContent = 'Edit Member Record';
-            document.getElementById('editMemberId').value = member.id;
-            document.getElementById('inputFullName').value = member.fullName || '';
-            document.getElementById('inputPurok').value = member.purok || 'PUROK 1';
-            document.getElementById('inputPurokGrupo').value = member.purokGrupo || '';
-            document.getElementById('inputEfStatus').value = member.efStatus || 'Approved';
-            document.getElementById('inputEfRef').value = member.efRef || '';
-            const efWk = extractWeekNumber(member.efRef || '');
-            document.getElementById('inputEfWeekSelect').value = efWk ? `Week ${efWk}` : '';
+            document.getElementById('memberModalTitle').textContent = 'Edit Member';
+            document.getElementById('editMemberId').value = m.id;
+            document.getElementById('inputFullName').value = m.fullName || '';
+            document.getElementById('inputPurok').value = m.purok || 'PUROK 1';
+            document.getElementById('inputPurokGrupo').value = m.purokGrupo || '';
+            document.getElementById('inputEfStatus').value = m.efStatus || 'Approved';
+            document.getElementById('inputEfRef').value = m.efRef || '';
+            const matchedEfWk = extractWeekNumber(m.efRef || '');
+            document.getElementById('inputEfWeekSelect').value = matchedEfWk ? `Week ${matchedEfWk}` : '';
+            document.getElementById('inputInitial309').value = getMember309TotalCount(m);
+            document.getElementById('inputInitial309').disabled = true;
+            document.getElementById('inputNotes').value = (m.notes || '').replace(/\r\n?/g, '\n');
+            document.getElementById('inputTigilStatus').value = m.tigilStatus || 'Pending';
 
-            document.getElementById('inputInitial309').value = getMember309TotalCount(member);
-            document.getElementById('input304Approved').value = member.status304 || 'Pending';
-            document.getElementById('input304Ref').value = member.ref304 || '';
-            const wk304 = extractWeekNumber(member.ref304 || '');
-            document.getElementById('input304WeekSelect').value = wk304 ? `Week ${wk304}` : '';
+            const isSinusubok = Object.keys(getL303Map(m)).length >= 30;
+            update304FieldState(isSinusubok, m.status304 || 'Pending', m.ref304 || '');
 
-            document.getElementById('inputBaptismStatus').value = member.baptismStatus || 'Pending';
-            document.getElementById('inputTigilStatus').value = member.tigilStatus || 'Pending';
-            const rawBaptDate = member.baptismDate || '';
-            document.getElementById('inputBaptismDateText').value = displayDateString(rawBaptDate);
-            const parsedBapt = rawBaptDate ? parseUsOrIsoDate(rawBaptDate) : null;
-            document.getElementById('inputBaptismDate').value = parsedBapt ? getFormattedDateInput(parsedBapt) : '';
+            const eligibleBaptism = isMemberForBaptism(m);
+            updateBaptismFieldState(eligibleBaptism, m.baptismStatus || 'Pending', m.baptismDate || '');
 
-            document.getElementById('inputNotes').value = member.notes || '';
-
-            const isSinusubok = Object.keys(getL303Map(member)).length >= 30;
-            const forBaptism = isMemberForBaptism(member) || isMemberBaptized(member);
-            updateForm304Availability(isSinusubok);
-            updateFormBaptismAvailability(forBaptism);
-
-            if (member.picture) {
-                currentFormPicDataUrl = member.picture;
-                document.getElementById('picPreviewImg').src = member.picture;
-                document.getElementById('picUploadPrompt').classList.add('hidden');
-                document.getElementById('picPreviewContainer').classList.remove('hidden');
-                document.getElementById('picPreviewContainer').classList.add('flex');
-            } else {
-                removePicFromForm();
-            }
-
-            if (member.qrCode) {
-                currentFormQrDataUrl = member.qrCode;
-                document.getElementById('qrPreviewImg').src = member.qrCode;
+            currentFormQrDataUrl = m.qrCode || '';
+            if (currentFormQrDataUrl) {
                 document.getElementById('qrUploadPrompt').classList.add('hidden');
-                document.getElementById('qrPreviewContainer').classList.remove('hidden');
-                document.getElementById('qrPreviewContainer').classList.add('flex');
+                const prev = document.getElementById('qrPreviewContainer');
+                prev.classList.remove('hidden');
+                prev.classList.add('flex');
+                document.getElementById('qrPreviewImg').src = currentFormQrDataUrl;
             } else {
                 removeQrFromForm();
             }
 
+            currentFormPicDataUrl = m.picture || '';
+            if (currentFormPicDataUrl) {
+                document.getElementById('picUploadPrompt').classList.add('hidden');
+                const prev = document.getElementById('picPreviewContainer');
+                prev.classList.remove('hidden');
+                prev.classList.add('flex');
+                document.getElementById('picPreviewImg').src = currentFormPicDataUrl;
+            } else {
+                removePicFromForm();
+            }
+
             const modal = document.getElementById('memberModal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function update304FieldState(unlocked, statusVal, refVal) {
+            const container = document.getElementById('field304Container');
+            const badge = document.getElementById('badge304Lock');
+            const select = document.getElementById('input304Approved');
+            const weekSel = document.getElementById('input304WeekSelect');
+            const input = document.getElementById('input304Ref');
+            const hint = document.getElementById('hint304Text');
+
+            select.value = statusVal;
+            input.value = refVal;
+            const matched304Wk = extractWeekNumber(refVal);
+            if (weekSel) weekSel.value = matched304Wk ? `Week ${matched304Wk}` : '';
+
+            if (unlocked) {
+                container.className = 'p-3.5 rounded-xl border border-purple-200 bg-purple-50/40 transition space-y-2.5';
+                badge.className = 'inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-purple-100 text-purple-800 text-[10px] font-bold';
+                badge.innerHTML = '<i data-lucide="unlock" class="w-2.5 h-2.5"></i> Unlocked (Sinusubok)';
+                select.disabled = false;
+                if (weekSel) weekSel.disabled = false;
+                input.disabled = false;
+                hint.textContent = 'Member has completed Doktrina 303 (30/30). You can update 304 status and reference.';
+            } else {
+                container.className = 'p-3.5 rounded-xl border border-slate-200 bg-slate-50 transition space-y-2.5';
+                badge.className = 'inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 text-[10px] font-bold';
+                badge.innerHTML = '<i data-lucide="lock" class="w-2.5 h-2.5"></i> Locked (Doktrina)';
+                select.disabled = true;
+                if (weekSel) weekSel.disabled = true;
+                input.disabled = true;
+                hint.textContent = 'Available once the member completes Doktrina 303 (30/30) and enters the Sinusubok stage.';
+            }
+        }
+
+        function updateBaptismFieldState(unlocked, statusVal, dateVal) {
+            const container = document.getElementById('fieldBaptismContainer');
+            const badge = document.getElementById('badgeBaptismLock');
+            const select = document.getElementById('inputBaptismStatus');
+            const dateInput = document.getElementById('inputBaptismDate');
+            const dateText = document.getElementById('inputBaptismDateText');
+            const hint = document.getElementById('hintBaptismText');
+
+            if (!container || !select || !dateInput || !dateText) return;
+
+            select.value = statusVal || 'Pending';
+            const isoVal = (() => {
+                if (!dateVal) return '';
+                const parsed = parseUsOrIsoDate(dateVal);
+                return parsed ? getFormattedDateInput(parsed) : '';
+            })();
+            dateInput.value = isoVal;
+            dateText.value = displayDateString(isoVal || dateVal || '');
+
+            if (unlocked) {
+                container.className = 'p-3.5 rounded-xl border border-sky-200 bg-sky-50/40 transition space-y-2.5';
+                badge.className = 'inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-sky-100 text-sky-800 text-[10px] font-bold';
+                badge.innerHTML = '<i data-lucide="unlock" class="w-2.5 h-2.5"></i> Unlocked (For Baptism)';
+                select.disabled = false;
+                dateInput.disabled = false;
+                dateText.disabled = false;
+                hint.textContent = 'Eligible for Baptism! Select "Approved" and pick the date to finalize baptism and move to Bautisado.';
+            } else {
+                container.className = 'p-3.5 rounded-xl border border-slate-200 bg-slate-50 transition space-y-2.5';
+                badge.className = 'inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-200 text-slate-600 text-[10px] font-bold';
+                badge.innerHTML = '<i data-lucide="lock" class="w-2.5 h-2.5"></i> Locked (Incomplete)';
+                select.disabled = true;
+                dateInput.disabled = true;
+                dateText.disabled = true;
+                hint.textContent = 'Available once 303 (30/30), 305 (15/15), and 309 (48/48) are completed. Approving removes the member from active monitoring and logs them under Bautisado.';
+            }
+        }
+
+        function handleBaptismStatusChange() {
+            const select = document.getElementById('inputBaptismStatus');
+            const dateInput = document.getElementById('inputBaptismDate');
+            const dateText = document.getElementById('inputBaptismDateText');
+            if (!select || !dateInput || !dateText) return;
+
+            if (select.value === 'Approved' && !dateInput.value && !dateText.value) {
+                const todayIso = getFormattedDateInput(new Date());
+                dateInput.value = todayIso;
+                dateText.value = displayDateString(todayIso);
+            }
         }
 
         function closeMemberModal() {
@@ -4146,186 +4156,111 @@
             modal.classList.remove('flex');
         }
 
-        async function saveMember(event) {
+        function saveMember(event) {
             event.preventDefault();
             if (!isAdmin) return;
-            const editId = document.getElementById('editMemberId').value;
+            const id = document.getElementById('editMemberId').value;
             const fullName = document.getElementById('inputFullName').value.trim();
             const purok = document.getElementById('inputPurok').value;
             const purokGrupo = document.getElementById('inputPurokGrupo').value.trim();
             const efStatus = document.getElementById('inputEfStatus').value;
             const efRef = document.getElementById('inputEfRef').value.trim();
-            const initial309 = Math.max(0, Math.min(48, parseInt(document.getElementById('inputInitial309').value || '0', 10)));
+            const notes = normalizeRemarksText(document.getElementById('inputNotes').value);
             const status304 = document.getElementById('input304Approved').value;
             const ref304 = document.getElementById('input304Ref').value.trim();
-            const baptismStatus = document.getElementById('inputBaptismStatus').value;
-            const baptismDate = document.getElementById('inputBaptismDateText').value.trim();
-            const tigilStatus = document.getElementById('inputTigilStatus').value || 'Pending';
-            const notes = document.getElementById('inputNotes').value.trim();
+            const baptismStatus = document.getElementById('inputBaptismStatus')?.value || 'Pending';
+            const baptismDateRaw = document.getElementById('inputBaptismDate')?.value || document.getElementById('inputBaptismDateText')?.value.trim() || '';
+            const tigilStatus = document.getElementById('inputTigilStatus')?.value || 'Pending';
 
-            if (!fullName || !purokGrupo) return;
-
-            if (baptismStatus === 'Approved' && !baptismDate) {
-                showToast('Pumili muna ng petsa ng pag-approve sa Baptism Status.');
-                const dateTextEl = document.getElementById('inputBaptismDateText');
-                if (dateTextEl) dateTextEl.focus();
-                return;
-            }
-
-            const processFileAsync = (fileInputId, isPng) => {
-                return new Promise((resolve) => {
-                    const fileInput = document.getElementById(fileInputId);
-                    if (fileInput && fileInput.files && fileInput.files[0]) {
-                        compressImage(fileInput.files[0], 300, isPng, (compressedUrl) => {
-                            resolve(compressedUrl);
-                        });
-                    } else {
-                        resolve(null);
-                    }
-                });
-            };
-
-            const newPicUrl = await processFileAsync('inputPicFile', false);
-            if (newPicUrl) currentFormPicDataUrl = newPicUrl;
-
-            const newQrUrl = await processFileAsync('inputQrFile', true);
-            if (newQrUrl) currentFormQrDataUrl = newQrUrl;
-
-            const todayStr = getTodayUsFormatted();
-
-            if (editId) {
-                const idx = members.findIndex(m => m.id === editId);
+            let savedId = id;
+            if (id) {
+                const idx = members.findIndex(m => m.id === id);
                 if (idx !== -1) {
-                    const existing = members[idx];
-                    const byYear = normalizeMemberC309Structure(existing);
-                    const currentYr = new Date().getFullYear();
-                    byYear[currentYr] = byYear[currentYr] || {};
-                    const currentCount = getMember309TotalCount(existing);
-                    if (initial309 > currentCount) {
-                        let added = 0;
-                        for (let i = 1; i <= 52 && added < (initial309 - currentCount); i++) {
-                            if (!byYear[currentYr][i]) {
-                                byYear[currentYr][i] = { mw: todayStr, we: '' };
-                                added++;
-                            }
-                        }
-                    } else if (initial309 < currentCount) {
-                        let toRemove = currentCount - initial309;
-                        const yearsDesc = Object.keys(byYear).map(Number).sort((a, b) => b - a);
-                        for (const yr of yearsDesc) {
-                            const weeksDesc = Object.keys(byYear[yr]).map(Number).sort((a, b) => b - a);
-                            for (const wk of weeksDesc) {
-                                if (toRemove <= 0) break;
-                                const slot = byYear[yr][wk];
-                                if (slot.we && slot.we !== 'Absent' && slot.we !== 'Approved') {
-                                    slot.we = '';
-                                    toRemove--;
-                                }
-                                if (toRemove > 0 && slot.mw && slot.mw !== 'Absent' && slot.mw !== 'Approved') {
-                                    slot.mw = '';
-                                    toRemove--;
-                                }
-                                if (!slot.mw && !slot.we) {
-                                    delete byYear[yr][wk];
-                                }
-                            }
-                        }
-                    }
+                    const eligibleBaptism = isMemberForBaptism(members[idx]);
+                    const finalBaptismStatus = eligibleBaptism ? baptismStatus : 'Pending';
+                    const finalBaptismDate = eligibleBaptism && (finalBaptismStatus === 'Approved' || finalBaptismStatus === 'For Final Screening')
+                        ? (baptismDateRaw || (finalBaptismStatus === 'Approved' ? getFormattedDateInput(new Date()) : ''))
+                        : (eligibleBaptism ? baptismDateRaw : '');
 
                     members[idx] = {
-                        ...existing,
+                        ...members[idx],
                         fullName,
                         purok,
                         purokGrupo,
                         efStatus,
                         efRef,
+                        notes,
                         status304,
                         ref304,
-                        baptismStatus,
-                        baptismDate,
+                        baptismStatus: finalBaptismStatus,
+                        baptismDate: finalBaptismDate,
                         tigilStatus,
-                        notes,
-                        c309: byYear,
-                        picture: currentFormPicDataUrl,
                         qrCode: currentFormQrDataUrl,
+                        picture: currentFormPicDataUrl,
                         updatedAt: Date.now()
                     };
-
-                    if (baptismStatus === 'Approved') {
-                        const info = getBaptismYearAndMonth(members[idx]);
-                        selectedBaptismYear = info.year;
-                        showToast(`Baptism Approved! Nailipat na sa Bautisado ${info.year}.`);
-                    } else if (tigilStatus === 'Approved') {
-                        showToast('Tigil Approved! Natanggal sa active monitoring (searchable pa rin sa search bar).');
-                    } else {
-                        showToast('Member record updated!');
-                    }
                 }
             } else {
+                const init309 = Math.min(48, Math.max(0, parseInt(document.getElementById('inputInitial309').value, 10) || 0));
+                const c309 = {};
+                const todayUs = getTodayUsFormatted();
                 const currentYr = new Date().getFullYear();
-                const c309Map = { [currentYr]: {} };
-                for (let i = 1; i <= initial309; i++) {
-                    c309Map[currentYr][i] = { mw: todayStr, we: '' };
+                c309[currentYr] = {};
+                for (let i = 1; i <= init309; i++) {
+                    const wk = Math.ceil(i / 2);
+                    if (!c309[currentYr][wk]) c309[currentYr][wk] = { mw: '', we: '' };
+                    if (i % 2 === 1) c309[currentYr][wk].mw = todayUs;
+                    else c309[currentYr][wk].we = todayUs;
                 }
-                const newMemberId = 'm_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
-                const newMemberObj = {
-                    id: newMemberId,
+
+                savedId = 'm_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+                members.unshift({
+                    id: savedId,
                     fullName,
                     purok,
                     purokGrupo,
                     efStatus,
                     efRef,
+                    notes,
                     status304: 'Pending',
                     ref304: '',
                     baptismStatus: 'Pending',
                     baptismDate: '',
-                    tigilStatus: 'Pending',
-                    notes,
+                    tigilStatus,
+                    qrCode: currentFormQrDataUrl,
+                    picture: currentFormPicDataUrl,
                     l303: {},
                     l305: {},
-                    c309: c309Map,
-                    picture: currentFormPicDataUrl,
-                    qrCode: currentFormQrDataUrl,
+                    c309,
                     createdAt: Date.now(),
                     updatedAt: Date.now()
-                };
-                members.push(newMemberObj);
-                
-                if (isAdmin) {
-                    db.collection('members').doc(newMemberId).set(newMemberObj).catch(err => {
-                        console.error("Error saving new member:", err);
-                    });
-                }
-                showToast('New member added!');
+                });
             }
 
-            persistMembers();
+            persistMembers(savedId);
             closeMemberModal();
             renderAll();
+            showToast(id ? 'Member updated!' : 'Member added!');
         }
 
-        function compressImage(file, maxDim, isPng, callback) {
+        // Picture & QR Compression
+        function compressImage(file, maxSize, callback) {
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = function(e) {
                 const img = new Image();
-                img.onload = () => {
+                img.onload = function() {
                     const canvas = document.createElement('canvas');
                     let w = img.width;
                     let h = img.height;
-                    if (w > maxDim || h > maxDim) {
-                        if (w > h) {
-                            h = Math.round((h * maxDim) / w);
-                            w = maxDim;
-                        } else {
-                            w = Math.round((w * maxDim) / h);
-                            h = maxDim;
-                        }
+                    if (w > maxSize || h > maxSize) {
+                        if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+                        else { w = Math.round(w * maxSize / h); h = maxSize; }
                     }
                     canvas.width = w;
                     canvas.height = h;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, w, h);
-                    callback(isPng ? canvas.toDataURL('image/png', 0.85) : canvas.toDataURL('image/jpeg', 0.75));
+                    callback(canvas.toDataURL('image/jpeg', 0.85));
                 };
                 img.src = e.target.result;
             };
@@ -4336,154 +4271,212 @@
             if (!isAdmin) return;
             const file = event.target.files[0];
             if (!file) return;
-            compressImage(file, 300, false, (dataUrl) => {
+            compressImage(file, 360, (dataUrl) => {
                 currentFormPicDataUrl = dataUrl;
-                document.getElementById('picPreviewImg').src = dataUrl;
                 document.getElementById('picUploadPrompt').classList.add('hidden');
-                document.getElementById('picPreviewContainer').classList.remove('hidden');
-                document.getElementById('picPreviewContainer').classList.add('flex');
+                const prev = document.getElementById('picPreviewContainer');
+                prev.classList.remove('hidden');
+                prev.classList.add('flex');
+                document.getElementById('picPreviewImg').src = dataUrl;
             });
         }
 
         function removePicFromForm() {
-            if (!isAdmin) return;
             currentFormPicDataUrl = '';
-            const fileInput = document.getElementById('inputPicFile');
-            if (fileInput) fileInput.value = '';
-            document.getElementById('picPreviewImg').src = '';
-            document.getElementById('picPreviewContainer').classList.add('hidden');
-            document.getElementById('picPreviewContainer').classList.remove('flex');
+            const inp = document.getElementById('inputPicFile');
+            if (inp) inp.value = '';
             document.getElementById('picUploadPrompt').classList.remove('hidden');
-        }
-
-        function openPicModal(memberId) {
-            const member = members.find(m => m.id === memberId);
-            if (!member || !member.picture) return;
-            activePicMemberId = memberId;
-            document.getElementById('picModalName').textContent = member.fullName;
-            document.getElementById('picModalSub').textContent = `${member.purok} — ${member.purokGrupo}`;
-            document.getElementById('picModalImage').src = member.picture;
-            const modal = document.getElementById('picModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-
-        function closePicModal() {
-            const modal = document.getElementById('picModal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
-
-        function handleQuickPicReplace(event) {
-            if (!isAdmin) return;
-            const file = event.target.files[0];
-            if (!file || !activePicMemberId) return;
-            compressImage(file, 300, false, (dataUrl) => {
-                const idx = members.findIndex(m => m.id === activePicMemberId);
-                if (idx !== -1) {
-                    members[idx].picture = dataUrl;
-                    members[idx].updatedAt = Date.now();
-                    persistMembers();
-                    const modalImg = document.getElementById('picModalImage');
-                    if (modalImg) modalImg.src = dataUrl;
-                    renderAll();
-                    showToast('Member picture updated!');
-                }
-                event.target.value = '';
-            });
+            const prev = document.getElementById('picPreviewContainer');
+            prev.classList.add('hidden');
+            prev.classList.remove('flex');
         }
 
         function handleQrUpload(event) {
             if (!isAdmin) return;
             const file = event.target.files[0];
             if (!file) return;
-            compressImage(file, 300, true, (dataUrl) => {
+            compressImage(file, 360, (dataUrl) => {
                 currentFormQrDataUrl = dataUrl;
-                document.getElementById('qrPreviewImg').src = dataUrl;
                 document.getElementById('qrUploadPrompt').classList.add('hidden');
-                document.getElementById('qrPreviewContainer').classList.remove('hidden');
-                document.getElementById('qrPreviewContainer').classList.add('flex');
+                const prev = document.getElementById('qrPreviewContainer');
+                prev.classList.remove('hidden');
+                prev.classList.add('flex');
+                document.getElementById('qrPreviewImg').src = dataUrl;
             });
         }
 
         function removeQrFromForm() {
-            if (!isAdmin) return;
             currentFormQrDataUrl = '';
-            const fileInput = document.getElementById('inputQrFile');
-            if (fileInput) fileInput.value = '';
-            document.getElementById('qrPreviewImg').src = '';
-            document.getElementById('qrPreviewContainer').classList.add('hidden');
-            document.getElementById('qrPreviewContainer').classList.remove('flex');
+            const inp = document.getElementById('inputQrFile');
+            if (inp) inp.value = '';
             document.getElementById('qrUploadPrompt').classList.remove('hidden');
+            const prev = document.getElementById('qrPreviewContainer');
+            prev.classList.add('hidden');
+            prev.classList.remove('flex');
         }
 
-        function openQrModal(memberId) {
-            const member = members.find(m => m.id === memberId);
-            if (!member || !member.qrCode) return;
-            activeQrMemberId = memberId;
-            document.getElementById('qrModalName').textContent = member.fullName;
-            document.getElementById('qrModalSub').textContent = `${member.purok} — ${member.purokGrupo}`;
-            document.getElementById('qrModalImage').src = member.qrCode;
+        // Picture Modal
+        function openPicModal(id) {
+            const m = members.find(x => x.id === id);
+            if (!m) return;
+            activePicMemberId = id;
+            if (!m.picture) {
+                if (isAdmin) {
+                    document.getElementById('quickDirectPicInput').click();
+                }
+                return;
+            }
+            document.getElementById('picModalName').textContent = m.fullName;
+            document.getElementById('picModalSub').textContent = `${m.purok} • ${m.purokGrupo}`;
+            document.getElementById('picModalImage').src = m.picture;
+            const modal = document.getElementById('picModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function closePicModal() {
+            const modal = document.getElementById('picModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            activePicMemberId = null;
+        }
+
+        function handleQuickPicReplace(event) {
+            if (!isAdmin) return;
+            const file = event.target.files[0];
+            if (!file || !activePicMemberId) return;
+            compressImage(file, 360, (dataUrl) => {
+                const idx = members.findIndex(x => x.id === activePicMemberId);
+                if (idx !== -1) {
+                    members[idx].picture = dataUrl;
+                    members[idx].updatedAt = Date.now();
+                    persistMembers(members[idx].id);
+                    renderMembers();
+                    const picImg = document.getElementById('picModalImage');
+                    if (picImg) picImg.src = dataUrl;
+                    showToast('Picture updated!');
+                }
+            });
+            event.target.value = '';
+        }
+
+        // QR Modal
+        function openQrModal(id) {
+            const m = members.find(x => x.id === id);
+            if (!m) return;
+            activeQrMemberId = id;
+            document.getElementById('qrModalName').textContent = m.fullName;
+            document.getElementById('qrModalSub').textContent = `${m.purok} • ${m.purokGrupo}`;
+
+            const imgEl = document.getElementById('qrModalImage');
+            if (m.qrCode) {
+                imgEl.src = m.qrCode;
+            } else {
+                const payload = `MEMBER:${m.fullName}|${m.purok}|${m.purokGrupo}`;
+                imgEl.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(payload)}`;
+            }
+
             const modal = document.getElementById('qrModal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
+            lucide.createIcons();
         }
 
         function closeQrModal() {
             const modal = document.getElementById('qrModal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
+            activeQrMemberId = null;
         }
 
         function handleQuickQrReplace(event) {
             if (!isAdmin) return;
             const file = event.target.files[0];
             if (!file || !activeQrMemberId) return;
-            compressImage(file, 300, true, (dataUrl) => {
-                const idx = members.findIndex(m => m.id === activeQrMemberId);
+            compressImage(file, 360, (dataUrl) => {
+                const idx = members.findIndex(x => x.id === activeQrMemberId);
                 if (idx !== -1) {
                     members[idx].qrCode = dataUrl;
                     members[idx].updatedAt = Date.now();
-                    persistMembers();
+                    persistMembers(members[idx].id);
+                    renderMembers();
                     document.getElementById('qrModalImage').src = dataUrl;
-                    renderAll();
                     showToast('QR Code updated!');
                 }
-                event.target.value = '';
             });
         }
 
         function downloadMemberQr() {
-            const member = members.find(m => m.id === activeQrMemberId);
-            if (!member || !member.qrCode) return;
+            const img = document.getElementById('qrModalImage');
+            const m = members.find(x => x.id === activeQrMemberId);
+            if (!img || !img.src) return;
             const a = document.createElement('a');
-            a.href = member.qrCode;
-            a.download = `${member.fullName.replace(/\s+/g, '_')}_QR.png`;
-            document.body.appendChild(a);
+            a.href = img.src;
+            a.download = `${(m ? m.fullName : 'member').replace(/\s+/g, '_')}_QR.png`;
+            a.target = '_blank';
             a.click();
-            a.remove();
         }
 
-        function openProgressModal(memberId) {
-            const member = members.find(m => m.id === memberId);
-            if (!member) return;
-            activeProgressMemberId = memberId;
-            activeProgressTab = 'l303';
-            active309Year = new Date().getFullYear();
+        // Delete Modal
+        function openDeleteModal(id) {
+            if (!isAdmin) return;
+            const m = members.find(x => x.id === id);
+            if (!m) return;
+            pendingDeleteMemberId = id;
+            document.getElementById('deleteModalText').textContent = `Delete "${m.fullName}" (${m.purok})? This cannot be undone.`;
+            const modal = document.getElementById('deleteModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+        }
 
-            const nameEl = document.getElementById('progressModalName');
-            const subEl = document.getElementById('progressModalSub');
-            if (nameEl) nameEl.textContent = member.fullName || '';
-            if (subEl) subEl.textContent = `${member.purok || ''} — ${member.purokGrupo || ''}`;
+        function closeDeleteModal() {
+            const modal = document.getElementById('deleteModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            pendingDeleteMemberId = null;
+        }
 
-            updateProgressModalTabs();
-            renderProgressGrid();
+        function confirmDeleteMember() {
+            if (!isAdmin) return;
+            if (pendingDeleteMemberId) {
+                const idToDelete = pendingDeleteMemberId;
+                members = members.filter(m => m.id !== idToDelete);
+                persistMembersLocal();
+                if (!isSyncingFromCloud) {
+                    db.collection('members').doc(idToDelete).delete().catch(console.error);
+                }
+                renderAll();
+                showToast('Member deleted!');
+            }
+            closeDeleteModal();
+        }
+
+        // Progress Modal (303, 305 & 309)
+        function openProgressModal(id, initialTab = 'l303') {
+            const m = members.find(x => x.id === id);
+            if (!m) return;
+            activeProgressMemberId = id;
+            const availableYears = getAvailable309Years(m);
+            const currentYr = new Date().getFullYear();
+            active309Year = availableYears.includes(currentYr) ? currentYr : availableYears[availableYears.length - 1];
+
+            document.getElementById('progressModalName').textContent = m.fullName;
+            document.getElementById('progressModalSub').textContent = `${m.purok} • ${m.purokGrupo}`;
+
+            const todayIso = getFormattedDateInput(new Date());
+            const activeLogDateEl = document.getElementById('activeLogDate');
+            if (activeLogDateEl) activeLogDateEl.value = todayIso;
+            const activeLogDateTextEl = document.getElementById('activeLogDateText');
+            if (activeLogDateTextEl) activeLogDateTextEl.value = displayDateString(todayIso);
+
+            updateProgressModalCounts();
+            switchProgressTab(initialTab);
 
             const modal = document.getElementById('progressModal');
-            if (modal) {
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-            }
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
             lucide.createIcons();
         }
 
@@ -4495,94 +4488,87 @@
             renderAll();
         }
 
-        function switchProgressTab(tabKey) {
-            const member = members.find(m => m.id === activeProgressMemberId);
-            if (!member) return;
+        function updateProgressModalCounts() {
+            const m = members.find(x => x.id === activeProgressMemberId);
+            if (!m) return;
+            const c303 = Object.keys(getL303Map(m)).length;
+            const c305 = Object.keys(m.l305 || {}).length;
+            const c309 = getMember309TotalCount(m);
+            const isSinusubok = c303 >= 30;
 
-            const isSinusubok = Object.keys(getL303Map(member)).length >= 30;
-            if (tabKey === 'l305' && !isSinusubok) {
-                showToast('Complete Doktrina 303 (30/30) first to unlock Pulong-Panalangin 305.');
+            document.getElementById('tabCount303').textContent = `${c303}/30`;
+            document.getElementById('tabCount305').textContent = `${c305}/15`;
+            document.getElementById('tabCount309').textContent = `${c309}/48`;
+
+            const lockIcon = document.getElementById('tabLock305');
+            if (isSinusubok) lockIcon.classList.add('hidden');
+            else lockIcon.classList.remove('hidden');
+        }
+
+        function switchProgressTab(tab) {
+            const m = members.find(x => x.id === activeProgressMemberId);
+            if (!m) return;
+            const isSinusubok = Object.keys(getL303Map(m)).length >= 30;
+
+            if (tab === 'l305' && !isSinusubok) {
+                showToast('Complete Doktrina 303 (30/30) first!');
                 return;
             }
 
-            activeProgressTab = tabKey;
-            updateProgressModalTabs();
-            renderProgressGrid();
-            lucide.createIcons();
-        }
+            activeProgressTab = tab;
 
-        function updateProgressModalTabs() {
-            const member = members.find(m => m.id === activeProgressMemberId);
-            if (!member) return;
-
-            const l303Count = Object.keys(getL303Map(member)).length;
-            const l305Count = Object.keys(member.l305 || {}).length;
-            const c309Count = getMember309TotalCount(member);
-            const isSinusubok = l303Count >= 30;
-
-            document.getElementById('tabCount303').textContent = `${l303Count}/30`;
-            document.getElementById('tabCount305').textContent = `${l305Count}/15`;
-            document.getElementById('tabCount309').textContent = `${c309Count}/48`;
-
-            const stdDateBar = document.getElementById('standardDateBar');
-            const yr309Bar = document.getElementById('c309YearBar');
-            if (activeProgressTab === 'c309') {
-                if (stdDateBar) stdDateBar.classList.add('hidden');
-                if (yr309Bar) {
-                    yr309Bar.classList.remove('hidden');
-                    yr309Bar.classList.add('flex');
-                }
-                render309YearControls(member);
+            const stdBar = document.getElementById('standardDateBar');
+            const c309Bar = document.getElementById('c309YearBar');
+            if (tab === 'c309') {
+                stdBar.classList.add('hidden');
+                c309Bar.classList.remove('hidden');
+                c309Bar.classList.add('flex');
+                render309YearControls(m);
             } else {
-                if (stdDateBar) stdDateBar.classList.remove('hidden');
-                if (yr309Bar) {
-                    yr309Bar.classList.add('hidden');
-                    yr309Bar.classList.remove('flex');
-                }
+                stdBar.classList.remove('hidden');
+                c309Bar.classList.add('hidden');
+                c309Bar.classList.remove('flex');
             }
 
-            const lockBadge = document.getElementById('tabLock305');
-            if (isSinusubok) {
-                lockBadge.classList.add('hidden');
-            } else {
-                lockBadge.classList.remove('hidden');
-            }
+            const tabMap = {
+                l303: { btn: 'tabBtn303', border: 'border-indigo-600', text: 'text-indigo-600' },
+                l305: { btn: 'tabBtn305', border: 'border-purple-600', text: 'text-purple-600' },
+                c309: { btn: 'tabBtn309', border: 'border-emerald-600', text: 'text-emerald-600' }
+            };
 
-            const tabs = ['l303', 'l305', 'c309'];
-            const btnIds = { l303: 'tabBtn303', l305: 'tabBtn305', c309: 'tabBtn309' };
-
-            tabs.forEach(t => {
-                const btn = document.getElementById(btnIds[t]);
-                if (t === activeProgressTab) {
-                    btn.className = 'px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 whitespace-nowrap cursor-pointer flex items-center gap-1.5';
+            Object.keys(tabMap).forEach(k => {
+                const el = document.getElementById(tabMap[k].btn);
+                if (k === tab) {
+                    el.className = `px-4 py-2.5 text-xs sm:text-sm font-bold border-b-2 ${tabMap[k].border} ${tabMap[k].text} whitespace-nowrap cursor-pointer flex items-center gap-1.5`;
                 } else {
-                    btn.className = 'px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap cursor-pointer flex items-center gap-1.5';
+                    el.className = `px-4 py-2.5 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 whitespace-nowrap cursor-pointer flex items-center gap-1.5`;
                 }
             });
+
+            renderProgressGrid();
         }
 
         function render309YearControls(member) {
             const years = getAvailable309Years(member);
             if (!years.includes(active309Year)) {
-                active309Year = new Date().getFullYear();
+                active309Year = years[years.length - 1];
             }
 
-            const tabsEl = document.getElementById('c309YearTabs');
+            const tabsContainer = document.getElementById('c309YearTabs');
             const selectEl = document.getElementById('global309Year');
-            const countBadgeEl = document.getElementById('c309YearPageCount');
+            const countBadge = document.getElementById('c309YearPageCount');
 
-            if (tabsEl) {
-                tabsEl.innerHTML = years.map(yr => {
+            if (tabsContainer) {
+                tabsContainer.innerHTML = years.map(yr => {
                     const yrCount = getMember309YearCount(member, yr);
                     const isActive = yr === active309Year;
                     return `
-                        <button type="button" onclick="switch309YearPage(${yr})" class="px-2.5 py-1 rounded-lg text-xs font-extrabold border transition cursor-pointer flex items-center gap-1 ${
+                        <button type="button" onclick="switch309YearPage(${yr})" class="px-2.5 py-1 rounded-lg text-xs font-extrabold border transition cursor-pointer ${
                             isActive
                                 ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
-                                : 'bg-white text-slate-700 border-slate-300 hover:bg-emerald-50 hover:border-emerald-300'
+                                : 'bg-white text-slate-700 border-slate-200 hover:bg-emerald-50 hover:border-emerald-300'
                         }">
-                            <span>${yr}</span>
-                            ${yrCount > 0 ? `<span class="px-1 rounded text-[9px] ${isActive ? 'bg-emerald-800 text-emerald-100' : 'bg-emerald-100 text-emerald-800'}">${yrCount}</span>` : ''}
+                            ${yr} <span class="ml-0.5 text-[10px] ${isActive ? 'text-emerald-100' : 'text-slate-400'}">(${yrCount})</span>
                         </button>
                     `;
                 }).join('');
@@ -4592,319 +4578,307 @@
                 selectEl.innerHTML = years.map(yr => `<option value="${yr}" ${yr === active309Year ? 'selected' : ''}>${yr}</option>`).join('');
             }
 
-            if (countBadgeEl) {
+            if (countBadge) {
                 const yrLogged = getMember309YearCount(member, active309Year);
-                countBadgeEl.textContent = `${yrLogged} Pagsamba in ${active309Year}`;
+                countBadge.textContent = `${yrLogged} logged in ${active309Year}`;
             }
         }
 
-        function switch309YearPage(newYr) {
-            const yrNum = parseInt(newYr, 10);
-            if (!yrNum) return;
-            active309Year = yrNum;
-            updateProgressModalTabs();
-            renderProgressGrid();
-        }
-
-        function setWeek309Slot(weekNum, slotType, val) {
-            if (!isAdmin) return;
-            const idx = members.findIndex(m => m.id === activeProgressMemberId);
-            if (idx === -1) return;
-            const member = members[idx];
-            const byYear = normalizeMemberC309Structure(member);
-            const yr = active309Year || new Date().getFullYear();
-            byYear[yr] = byYear[yr] || {};
-
-            const entry = byYear[yr][weekNum] || { mw: '', we: '' };
-
-            if (slotType === 'mw') {
-                entry.mw = val;
-            } else if (slotType === 'we') {
-                entry.we = val;
+        function switch309YearPage(yearVal) {
+            active309Year = Number(yearVal);
+            const m = members.find(x => x.id === activeProgressMemberId);
+            if (m) {
+                render309YearControls(m);
+                renderProgressGrid();
             }
-
-            if (!entry.mw && !entry.we) {
-                delete byYear[yr][weekNum];
-                if (Object.keys(byYear[yr]).length === 0) {
-                    delete byYear[yr];
-                }
-            } else {
-                byYear[yr][weekNum] = entry;
-            }
-
-            member.c309 = byYear;
-            member.updatedAt = Date.now();
-            persistMembers(member.id);
-            updateProgressModalTabs();
-            renderProgressGrid();
-            updateStats();
-            renderPurokTabs();
         }
 
         function renderProgressGrid() {
-            const member = members.find(m => m.id === activeProgressMemberId);
+            const m = members.find(x => x.id === activeProgressMemberId);
+            if (!m) return;
             const grid = document.getElementById('progressGrid');
-            if (!member || !grid) return;
 
             if (activeProgressTab === 'c309') {
-                grid.className = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3';
-                const byYear = normalizeMemberC309Structure(member);
-                const yr = active309Year || new Date().getFullYear();
-                const yearWeeks = byYear[yr] || {};
-                const availableYears = getAvailable309Years(member);
+                grid.className = 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5';
+                const byYear = normalizeMemberC309Structure(m);
+                const yearWeeksMap = byYear[active309Year] || {};
+                const selectedYear = active309Year;
                 let html = '';
 
                 for (let w = 1; w <= 52; w++) {
-                    const entry = yearWeeks[w] || { mw: '', we: '' };
-                    const weekDates = getDatesForIsoWeek(yr, w);
-                    const hasMw = Boolean(entry.mw);
-                    const hasWe = Boolean(entry.we);
-                    const isMwApproved = entry.mw === 'Approved';
-                    const isWeApproved = entry.we === 'Approved';
-                    const isMwAbsent = entry.mw === 'Absent' || isSlotAutoAbsent309(member, yr, w, 'mw');
-                    const isWeAbsent = entry.we === 'Absent' || isSlotAutoAbsent309(member, yr, w, 'we');
-                    const hasAnyPresent = (hasMw && !isMwAbsent && !isMwApproved) || (hasWe && !isWeAbsent && !isWeApproved);
-                    const hasAnyApproved = isMwApproved || isWeApproved;
-                    const hasAnyAbsent = isMwAbsent || isWeAbsent;
+                    const entry = yearWeeksMap[w] || { mw: '', we: '' };
+                    const mwVal = entry.mw || '';
+                    const weVal = entry.we || '';
+                    const mwAutoAbsent = isSlotAutoAbsent309(m, selectedYear, w, 'mw');
+                    const weAutoAbsent = isSlotAutoAbsent309(m, selectedYear, w, 'we');
 
-                    let cardBorder = 'border-slate-300 bg-white';
-                    let topBarClass = 'border-slate-300 bg-slate-100 text-slate-800';
-                    let dividerBorder = 'border-slate-300';
-                    if (hasAnyAbsent && !hasAnyPresent) {
-                        cardBorder = 'border-rose-400 bg-rose-50/20';
-                        topBarClass = 'border-rose-400 bg-rose-600 text-white';
-                        dividerBorder = 'border-rose-400';
-                    } else if (hasAnyPresent) {
-                        cardBorder = 'border-emerald-500 bg-emerald-50/20';
-                        topBarClass = 'border-emerald-500 bg-emerald-600 text-white';
-                        dividerBorder = 'border-emerald-500';
-                    } else if (hasAnyApproved) {
-                        cardBorder = 'border-blue-500 bg-blue-50/20';
-                        topBarClass = 'border-blue-500 bg-blue-600 text-white';
-                        dividerBorder = 'border-blue-500';
-                    }
+                    const mwPresent = !!(mwVal && mwVal !== 'Absent' && mwVal !== 'Approved');
+                    const mwAbsent = (mwVal === 'Absent') || mwAutoAbsent;
+                    const mwApproved = mwVal === 'Approved';
 
-                    const mwCellBg = isMwApproved
-                        ? 'bg-blue-600 text-white'
-                        : (isMwAbsent ? 'bg-rose-500 text-white' : (hasMw ? 'bg-emerald-500 text-white' : 'bg-white hover:bg-slate-50 text-slate-700'));
-                    const weCellBg = isWeApproved
-                        ? 'bg-blue-600 text-white'
-                        : (isWeAbsent ? 'bg-rose-500 text-white' : (hasWe ? 'bg-teal-600 text-white' : 'bg-white hover:bg-slate-50 text-slate-700'));
+                    const wePresent = !!(weVal && weVal !== 'Absent' && weVal !== 'Approved');
+                    const weAbsent = (weVal === 'Absent') || weAutoAbsent;
+                    const weApproved = weVal === 'Approved';
 
-                    const mwColored = isMwApproved || isMwAbsent || hasMw;
-                    const weColored = isWeApproved || isWeAbsent || hasWe;
+                    const bothPresent = mwPresent && wePresent;
+                    const anyPresent = mwPresent || wePresent;
+                    const anyAbsent = mwAbsent || weAbsent;
+                    const anyApproved = mwApproved || weApproved;
 
-                    const yearOptionsHtml = availableYears.map(y => `<option value="${y}" ${y === yr ? 'selected' : ''}>${y}</option>`).join('');
+                    const weekDates = getDatesForIsoWeek(selectedYear, w);
+
+                    const cardStyle = bothPresent
+                        ? 'bg-emerald-50/75 border-emerald-400 text-emerald-950 shadow-2xs'
+                        : anyPresent
+                            ? 'bg-emerald-50/35 border-emerald-200 text-slate-900'
+                            : anyApproved
+                                ? 'bg-blue-50/60 border-blue-300 text-blue-950'
+                                : anyAbsent
+                                    ? 'bg-rose-50/55 border-rose-300 text-rose-950'
+                                    : 'bg-slate-50/70 border-slate-200 text-slate-700';
+
+                    const getSelectClass = (isPresent, isAbsent, isApproved) => {
+                        if (isPresent) return 'bg-emerald-600 text-white border-emerald-600 font-bold';
+                        if (isApproved) return 'bg-blue-600 text-white border-blue-600 font-bold';
+                        if (isAbsent) return 'bg-rose-600 text-white border-rose-600 font-bold';
+                        return 'bg-white text-slate-700 border-slate-300 font-semibold';
+                    };
+
+                    const getDisplayValueLabel = (val, isAutoAbs) => {
+                        if (isAutoAbs) return 'Absent';
+                        if (!val) return '—';
+                        if (val === 'Absent') return 'Absent';
+                        if (val === 'Approved') return 'Approved';
+                        return displayDateString(val);
+                    };
 
                     html += `
-                        <div class="rounded-xl border-2 ${cardBorder} overflow-hidden shadow-2xs flex flex-col">
-                            <div class="grid grid-cols-12 border-b-2 ${topBarClass}">
-                                <div class="col-span-7 px-2.5 py-1.5 text-xs font-extrabold tracking-tight flex items-center border-r-2 ${dividerBorder}">
-                                    WEEK ${w}
-                                </div>
-                                <div class="col-span-5 px-1.5 py-1 flex items-center justify-center">
-                                    <select onchange="switch309YearPage(this.value)" title="Switch Year Page" class="w-full text-[11px] font-extrabold text-center bg-transparent focus:outline-none cursor-pointer ${hasAnyPresent || hasAnyAbsent || hasAnyApproved ? 'text-white [&>option]:text-slate-900' : 'text-slate-700'}">
-                                        ${yearOptionsHtml}
-                                    </select>
-                                </div>
+                        <div class="p-2.5 rounded-xl border ${cardStyle} flex flex-col justify-between gap-2 transition">
+                            <div class="flex items-center justify-between gap-1">
+                                <span class="text-xs font-extrabold tracking-tight ${bothPresent ? 'text-emerald-800' : anyApproved ? 'text-blue-800' : anyAbsent ? 'text-rose-800' : 'text-slate-900'}">Week ${w}</span>
+                                <span class="text-[10px] font-bold text-slate-500">${selectedYear}</span>
                             </div>
-
-                            <div class="grid grid-cols-2 flex-1">
-                                <div class="p-2 border-r-2 ${dividerBorder} flex flex-col items-center justify-center ${mwCellBg} transition">
-                                    <span class="text-[10px] font-extrabold uppercase tracking-wider ${mwColored ? 'text-white/90' : 'text-slate-400'}">MW</span>
-                                    <select ${!isAdmin ? 'disabled' : ''} onchange="setWeek309Slot(${w}, 'mw', this.value)" class="mt-0.5 w-full text-[11px] font-bold text-center bg-transparent focus:outline-none cursor-pointer ${mwColored ? 'text-white [&>option]:text-slate-900' : 'text-slate-800'}">
-                                        <option value="" ${!hasMw ? 'selected' : ''}>${isMwAbsent && !hasMw ? 'Absent (Auto)' : '— Pick —'}</option>
-                                        <option value="Approved" ${isMwApproved ? 'selected' : ''}>Approved</option>
-                                        <option value="${weekDates.wedUs}" ${entry.mw === weekDates.wedUs ? 'selected' : ''}>Wed (${weekDates.wedShort})</option>
-                                        <option value="${weekDates.thuUs}" ${entry.mw === weekDates.thuUs ? 'selected' : ''}>Thu (${weekDates.thuShort})</option>
-                                    </select>
-                                    ${hasMw && !isMwAbsent && !isMwApproved ? `<span class="text-[9px] font-semibold text-white/90 mt-0.5">${escapeHtml(entry.mw)}</span>` : ''}
-                                    ${isMwApproved ? `<span class="text-[9px] font-extrabold text-blue-100 mt-0.5 uppercase">Approved</span>` : ''}
-                                    ${isMwAbsent ? `<span class="text-[9px] font-extrabold text-rose-100 mt-0.5 uppercase">Absent</span>` : ''}
+                            <div class="grid grid-cols-2 gap-1.5">
+                                <div class="flex flex-col gap-0.5">
+                                    <span class="text-[9px] font-bold uppercase text-slate-500">MW (${weekDates.wedShort}/${weekDates.thuShort})</span>
+                                    ${isAdmin ? `
+                                        <select onchange="update309WeekSlot(${w}, 'mw', this.value)" class="w-full px-1.5 py-1 rounded-lg border text-[10px] focus:outline-none cursor-pointer ${getSelectClass(mwPresent, mwAbsent, mwApproved)}">
+                                            <option value="" ${!mwVal && !mwAutoAbsent ? 'selected' : ''} class="bg-white text-slate-700">—</option>
+                                            <option value="Approved" ${mwApproved ? 'selected' : ''} class="bg-white text-blue-700 font-bold">Approved</option>
+                                            <option value="${weekDates.wedUs}" ${mwVal === weekDates.wedUs ? 'selected' : ''} class="bg-white text-slate-900">Wed ${weekDates.wedShort}</option>
+                                            <option value="${weekDates.thuUs}" ${mwVal === weekDates.thuUs ? 'selected' : ''} class="bg-white text-slate-900">Thu ${weekDates.thuShort}</option>
+                                            <option value="Absent" ${mwAbsent ? 'selected' : ''} class="bg-white text-rose-700 font-bold">Absent</option>
+                                        </select>
+                                    ` : `
+                                        <div class="w-full px-1.5 py-1 rounded-lg border text-[10px] text-center ${getSelectClass(mwPresent, mwAbsent, mwApproved)}">${escapeHtml(getDisplayValueLabel(mwVal, mwAutoAbsent))}</div>
+                                    `}
                                 </div>
-
-                                <div class="p-2 flex flex-col items-center justify-center ${weCellBg} transition">
-                                    <span class="text-[10px] font-extrabold uppercase tracking-wider ${weColored ? 'text-white/90' : 'text-slate-400'}">WE</span>
-                                    <select ${!isAdmin ? 'disabled' : ''} onchange="setWeek309Slot(${w}, 'we', this.value)" class="mt-0.5 w-full text-[11px] font-bold text-center bg-transparent focus:outline-none cursor-pointer ${weColored ? 'text-white [&>option]:text-slate-900' : 'text-slate-800'}">
-                                        <option value="" ${!hasWe ? 'selected' : ''}>${isWeAbsent && !hasWe ? 'Absent (Auto)' : '— Pick —'}</option>
-                                        <option value="Approved" ${isWeApproved ? 'selected' : ''}>Approved</option>
-                                        <option value="${weekDates.satUs}" ${entry.we === weekDates.satUs ? 'selected' : ''}>Sat (${weekDates.satShort})</option>
-                                        <option value="${weekDates.sunUs}" ${entry.we === weekDates.sunUs ? 'selected' : ''}>Sun (${weekDates.sunShort})</option>
-                                    </select>
-                                    ${hasWe && !isWeAbsent && !isWeApproved ? `<span class="text-[9px] font-semibold text-white/90 mt-0.5">${escapeHtml(entry.we)}</span>` : ''}
-                                    ${isWeApproved ? `<span class="text-[9px] font-extrabold text-blue-100 mt-0.5 uppercase">Approved</span>` : ''}
-                                    ${isWeAbsent ? `<span class="text-[9px] font-extrabold text-rose-100 mt-0.5 uppercase">Absent</span>` : ''}
+                                <div class="flex flex-col gap-0.5">
+                                    <span class="text-[9px] font-bold uppercase text-slate-500">WE (${weekDates.satShort}/${weekDates.sunShort})</span>
+                                    ${isAdmin ? `
+                                        <select onchange="update309WeekSlot(${w}, 'we', this.value)" class="w-full px-1.5 py-1 rounded-lg border text-[10px] focus:outline-none cursor-pointer ${getSelectClass(wePresent, weAbsent, weApproved)}">
+                                            <option value="" ${!weVal && !weAutoAbsent ? 'selected' : ''} class="bg-white text-slate-700">—</option>
+                                            <option value="Approved" ${weApproved ? 'selected' : ''} class="bg-white text-blue-700 font-bold">Approved</option>
+                                            <option value="${weekDates.satUs}" ${weVal === weekDates.satUs ? 'selected' : ''} class="bg-white text-slate-900">Sat ${weekDates.satShort}</option>
+                                            <option value="${weekDates.sunUs}" ${weVal === weekDates.sunUs ? 'selected' : ''} class="bg-white text-slate-900">Sun ${weekDates.sunShort}</option>
+                                            <option value="Absent" ${weAbsent ? 'selected' : ''} class="bg-white text-rose-700 font-bold">Absent</option>
+                                        </select>
+                                    ` : `
+                                        <div class="w-full px-1.5 py-1 rounded-lg border text-[10px] text-center ${getSelectClass(wePresent, weAbsent, weApproved)}">${escapeHtml(getDisplayValueLabel(weVal, weAutoAbsent))}</div>
+                                    `}
                                 </div>
                             </div>
                         </div>
                     `;
                 }
                 grid.innerHTML = html;
+                lucide.createIcons();
                 return;
             }
 
             grid.className = 'grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 gap-2.5';
-            let maxItems = 30;
-            let dataMap = getL303Map(member);
-            let activeColor = 'bg-blue-600 text-white border-blue-600 shadow-xs';
-
-            if (activeProgressTab === 'l305') {
-                maxItems = 15;
-                dataMap = member.l305 || {};
-                activeColor = 'bg-purple-600 text-white border-purple-600 shadow-xs';
-            }
+            const max = activeProgressTab === 'l303' ? 30 : 15;
+            const prefix = activeProgressTab === 'l303' ? 'L' : '305-';
+            const map = activeProgressTab === 'l303' ? getL303Map(m) : (m.l305 || {});
+            const activeBg = activeProgressTab === 'l303' ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-purple-600 border-purple-600 text-white';
 
             let html = '';
-            for (let i = 1; i <= maxItems; i++) {
-                const recordedDate = dataMap[i];
-                const isDone = Boolean(recordedDate);
+            for (let i = 1; i <= max; i++) {
+                const dateVal = map[i];
+                const completed = Boolean(dateVal);
                 html += `
-                    <button type="button" ${!isAdmin ? 'disabled' : ''} onclick="toggleProgressTile(${i})" class="p-2.5 rounded-xl border text-center transition cursor-pointer flex flex-col items-center justify-center min-h-[62px] ${
-                        isDone ? activeColor : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
-                    }">
-                        <span class="text-sm font-extrabold leading-none">${i}</span>
-                        <span class="text-[10px] font-semibold mt-1 tracking-tight ${isDone ? 'text-white/95' : 'text-slate-400'}">
-                            ${isDone ? escapeHtml(displayDateString(recordedDate)) : '—'}
+                    <button type="button" onclick="toggleProgressSlot(${i})" class="p-2.5 rounded-xl border text-center transition flex flex-col items-center justify-center min-h-[68px] ${
+                        completed ? activeBg + ' shadow-xs' : 'bg-slate-50 border-slate-200 text-slate-700 ' + (isAdmin ? 'hover:bg-slate-100' : '')
+                    } ${isAdmin ? 'cursor-pointer' : 'cursor-default'}">
+                        <span class="text-xs font-extrabold">${prefix}${i}</span>
+                        <span class="text-[10px] mt-1 font-medium ${completed ? 'text-white/95' : 'text-slate-400'}">
+                            ${completed ? displayDateString(dateVal) : 'Pending'}
                         </span>
                     </button>
                 `;
             }
             grid.innerHTML = html;
+            lucide.createIcons();
         }
 
-        function toggleProgressTile(num) {
+        function update309WeekSlot(weekNum, slotType, val) {
             if (!isAdmin) return;
-            const idx = members.findIndex(m => m.id === activeProgressMemberId);
-            if (idx === -1) return;
+            const m = members.find(x => x.id === activeProgressMemberId);
+            if (!m) return;
+            const byYear = normalizeMemberC309Structure(m);
+            const selectedYear = active309Year;
+            if (!byYear[selectedYear]) byYear[selectedYear] = {};
 
-            const member = members[idx];
-            if (!member.l303) member.l303 = { ...getL303Map(member) };
-            if (!member.l305) member.l305 = {};
-            if (!member.c309) member.c309 = {};
+            const currentTotal = getMember309TotalCount(m);
+            const existingEntry = byYear[selectedYear][weekNum] || { mw: '', we: '' };
+            const prevVal = existingEntry[slotType] || '';
+            const wasCounted = !!(prevVal && prevVal !== 'Absent' && prevVal !== 'Approved');
+            const willBeCounted = !!(val && val !== 'Absent' && val !== 'Approved');
 
-            if (activeProgressTab === 'l303' && member.l310) {
-                delete member.l310;
+            if (!wasCounted && willBeCounted && currentTotal >= 48) {
+                showToast('Maximum 48 Pagsamba 309 reached!');
+                renderProgressGrid();
+                return;
             }
 
-            const map = member[activeProgressTab];
-            const dateText = document.getElementById('activeLogDateText').value.trim() || getTodayUsFormatted();
+            if (val === 'Approved') {
+                Object.keys(byYear).forEach(yrKey => {
+                    const wMap = byYear[yrKey] || {};
+                    Object.keys(wMap).forEach(wkKey => {
+                        if (wMap[wkKey].mw === 'Approved') wMap[wkKey].mw = '';
+                        if (wMap[wkKey].we === 'Approved') wMap[wkKey].we = '';
+                        if (!wMap[wkKey].mw && !wMap[wkKey].we) {
+                            delete wMap[wkKey];
+                        }
+                    });
+                });
+                if (!byYear[selectedYear]) byYear[selectedYear] = {};
+            }
 
-            if (map[num]) {
-                delete map[num];
+            const updatedEntry = {
+                mw: slotType === 'mw' ? val : ((byYear[selectedYear][weekNum] && byYear[selectedYear][weekNum].mw) || ''),
+                we: slotType === 'we' ? val : ((byYear[selectedYear][weekNum] && byYear[selectedYear][weekNum].we) || '')
+            };
+
+            if (!updatedEntry.mw && !updatedEntry.we) {
+                delete byYear[selectedYear][weekNum];
             } else {
-                map[num] = dateText;
+                byYear[selectedYear][weekNum] = updatedEntry;
             }
 
-            member.updatedAt = Date.now();
-            persistMembers(member.id);
-            updateProgressModalTabs();
+            m.c309 = byYear;
+            m.updatedAt = Date.now();
+            persistMembers(m.id);
+            updateProgressModalCounts();
+            render309YearControls(m);
             renderProgressGrid();
-            updateStats();
-            renderPurokTabs();
+            if (val === 'Approved') {
+                showToast(`Approved baseline set on Week ${weekNum} (${selectedYear}).`);
+            }
+        }
+
+        function toggleProgressSlot(index) {
+            if (!isAdmin) return;
+            const m = members.find(x => x.id === activeProgressMemberId);
+            if (!m) return;
+
+            if (activeProgressTab === 'l303' && !m.l303) {
+                m.l303 = { ...getL303Map(m) };
+            }
+            if (!m[activeProgressTab]) m[activeProgressTab] = {};
+
+            if (m[activeProgressTab][index]) {
+                delete m[activeProgressTab][index];
+            } else {
+                const chosenDate = document.getElementById('activeLogDateText')?.value.trim() || document.getElementById('activeLogDate')?.value || getTodayUsFormatted();
+                m[activeProgressTab][index] = displayDateString(chosenDate);
+            }
+
+            m.updatedAt = Date.now();
+            persistMembers(m.id);
+            updateProgressModalCounts();
+            renderProgressGrid();
         }
 
         function markAllInTab() {
             if (!isAdmin) return;
-            const idx = members.findIndex(m => m.id === activeProgressMemberId);
-            if (idx === -1) return;
-
-            const member = members[idx];
-            if (!member.l303) member.l303 = { ...getL303Map(member) };
-            if (!member.l305) member.l305 = {};
-            if (!member.c309) member.c309 = {};
+            const m = members.find(x => x.id === activeProgressMemberId);
+            if (!m) return;
 
             if (activeProgressTab === 'c309') {
-                const yr = active309Year || new Date().getFullYear();
-                const byYear = normalizeMemberC309Structure(member);
-                byYear[yr] = byYear[yr] || {};
-                for (let w = 1; w <= 24; w++) {
-                    const dates = getDatesForIsoWeek(yr, w);
-                    byYear[yr][w] = { mw: dates.wedUs, we: dates.satUs };
+                const byYear = normalizeMemberC309Structure(m);
+                const selectedYear = active309Year;
+                if (!byYear[selectedYear]) byYear[selectedYear] = {};
+                let currentTotal = getMember309TotalCount(m);
+                for (let w = 1; w <= 52; w++) {
+                    if (currentTotal >= 48) break;
+                    const weekDates = getDatesForIsoWeek(selectedYear, w);
+                    if (!byYear[selectedYear][w]) byYear[selectedYear][w] = { mw: '', we: '' };
+                    if (!byYear[selectedYear][w].mw && currentTotal < 48) {
+                        byYear[selectedYear][w].mw = weekDates.wedUs;
+                        currentTotal++;
+                    }
+                    if (!byYear[selectedYear][w].we && currentTotal < 48) {
+                        byYear[selectedYear][w].we = weekDates.satUs;
+                        currentTotal++;
+                    }
                 }
-                member.c309 = byYear;
-            } else {
-                const maxItems = activeProgressTab === 'l303' ? 30 : 15;
-                const dateText = document.getElementById('activeLogDateText').value.trim() || getTodayUsFormatted();
-                const map = member[activeProgressTab];
-
-                for (let i = 1; i <= maxItems; i++) {
-                    if (!map[i]) map[i] = dateText;
-                }
+                m.c309 = byYear;
+                m.updatedAt = Date.now();
+                persistMembers(m.id);
+                updateProgressModalCounts();
+                render309YearControls(m);
+                renderProgressGrid();
+                showToast(`Marked up to 48 total in ${selectedYear}!`);
+                return;
             }
 
-            if (activeProgressTab === 'l303' && member.l310) {
-                delete member.l310;
+            if (activeProgressTab === 'l303' && !m.l303) {
+                m.l303 = { ...getL303Map(m) };
             }
+            const max = activeProgressTab === 'l303' ? 30 : 15;
+            const chosenDate = document.getElementById('activeLogDateText')?.value.trim() || document.getElementById('activeLogDate')?.value || getTodayUsFormatted();
+            const formattedChosen = displayDateString(chosenDate);
+            if (!m[activeProgressTab]) m[activeProgressTab] = {};
 
-            member.updatedAt = Date.now();
-            persistMembers(member.id);
-            updateProgressModalTabs();
+            for (let i = 1; i <= max; i++) {
+                if (!m[activeProgressTab][i]) m[activeProgressTab][i] = formattedChosen;
+            }
+            m.updatedAt = Date.now();
+            persistMembers(m.id);
+            updateProgressModalCounts();
             renderProgressGrid();
-            updateStats();
-            renderPurokTabs();
+            showToast('All marked complete!');
         }
 
         function clearAllInTab() {
             if (!isAdmin) return;
-            const idx = members.findIndex(m => m.id === activeProgressMemberId);
-            if (idx === -1) return;
+            const m = members.find(x => x.id === activeProgressMemberId);
+            if (!m) return;
 
-            const member = members[idx];
             if (activeProgressTab === 'c309') {
-                const yr = active309Year || new Date().getFullYear();
-                const byYear = normalizeMemberC309Structure(member);
-                delete byYear[yr];
-                member.c309 = byYear;
-            } else {
-                member[activeProgressTab] = {};
-                if (activeProgressTab === 'l303' && member.l310) {
-                    delete member.l310;
-                }
+                const byYear = normalizeMemberC309Structure(m);
+                byYear[active309Year] = {};
+                m.c309 = byYear;
+                m.updatedAt = Date.now();
+                persistMembers(m.id);
+                updateProgressModalCounts();
+                render309YearControls(m);
+                renderProgressGrid();
+                showToast(`Cleared ${active309Year} records!`);
+                return;
             }
 
-            member.updatedAt = Date.now();
-            persistMembers(member.id);
-            updateProgressModalTabs();
+            m[activeProgressTab] = {};
+            if (activeProgressTab === 'l303') m.l310 = {};
+            m.updatedAt = Date.now();
+            persistMembers(m.id);
+            updateProgressModalCounts();
             renderProgressGrid();
-            updateStats();
-            renderPurokTabs();
+            showToast('Records cleared!');
         }
 
-        function openDeleteModal(memberId) {
-            if (!isAdmin) return;
-            const member = members.find(m => m.id === memberId);
-            if (!member) return;
-            pendingDeleteMemberId = memberId;
-            document.getElementById('deleteModalText').textContent = `This will permanently remove ${member.fullName} (${member.purok}).`;
-            const modal = document.getElementById('deleteModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-
-        function closeDeleteModal() {
-            pendingDeleteMemberId = null;
-            const modal = document.getElementById('deleteModal');
-            modal.classList.add('hidden');
-            modal.classList.remove('flex');
-        }
-
-        function confirmDeleteMember() {
-            if (!isAdmin || !pendingDeleteMemberId) return;
-            const memberIdToDelete = pendingDeleteMemberId;
-            members = members.filter(m => m.id !== memberIdToDelete);
-            
-            if (isAdmin) {
-                db.collection('members').doc(memberIdToDelete).delete().catch(err => {
-                    console.error("Error deleting member from Firestore:", err);
-                });
-            }
-
-            persistMembers();
-            closeDeleteModal();
-            renderAll();
-            showToast('Member record deleted.');
-        }
-
+        // Backup & Restore Modal
         function openBackupModal() {
             if (!isAdmin) return;
             const modal = document.getElementById('backupModal');
@@ -4920,16 +4894,16 @@
         }
 
         function exportJsonData() {
-            const blob = new Blob([JSON.stringify(members, null, 2)], { type: 'application/json' });
+            if (!isAdmin) return;
+            const dataStr = JSON.stringify({ purokNames: PUROK_NAMES, members }, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `progress_monitoring_backup_${getTodayUsFormatted()}.json`;
-            document.body.appendChild(a);
+            a.download = `Progress_Monitoring_Backup_${getTodayUsFormatted()}.json`;
             a.click();
-            a.remove();
             URL.revokeObjectURL(url);
-            showToast('Backup file downloaded!');
+            showToast('Backup downloaded!');
         }
 
         function importJsonData(event) {
@@ -4937,11 +4911,16 @@
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = function(e) {
                 try {
-                    const imported = JSON.parse(e.target.result);
-                    if (Array.isArray(imported)) {
-                        members = imported.map(m => {
+                    const parsed = JSON.parse(e.target.result);
+                    const importedMembers = Array.isArray(parsed) ? parsed : (Array.isArray(parsed.members) ? parsed.members : null);
+                    if (importedMembers) {
+                        if (parsed.purokNames && typeof parsed.purokNames === 'object') {
+                            PUROK_NAMES = { ...DEFAULT_PUROK_NAMES, ...parsed.purokNames };
+                            savePurokNames();
+                        }
+                        members = importedMembers.map(m => {
                             if (!m.l303 && m.l310) m.l303 = { ...m.l310 };
                             if (!m.baptismStatus) m.baptismStatus = 'Pending';
                             if (!m.baptismDate) m.baptismDate = '';
@@ -4949,43 +4928,41 @@
                             return m;
                         });
                         persistMembers();
-                        migrateLegacyMembersToCloud();
-                        closeBackupModal();
                         renderAll();
-                        showToast(`Restored ${members.length} member records!`);
+                        closeBackupModal();
+                        showToast('Backup restored!');
                     } else {
-                        showToast('Invalid backup file format.');
+                        showToast('Invalid backup file.');
                     }
                 } catch (err) {
-                    showToast('Failed to read backup file.');
+                    showToast('Error reading JSON file.');
                 }
-                event.target.value = '';
             };
             reader.readAsText(file);
+            event.target.value = '';
         }
 
         function escapeHtml(str) {
-            return String(str || '')
+            if (!str) return '';
+            return String(str)
                 .replace(/&/g, '&amp;')
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
+                .replace(/"/g, '&quot;');
         }
 
         let toastTimer = null;
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toastMsg');
-            if (!toast || !toastMsg) return;
-            toastMsg.textContent = message;
-            toast.classList.remove('hidden');
-            toast.classList.add('flex');
-            if (toastTimer) clearTimeout(toastTimer);
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = msg;
+            t.classList.remove('hidden');
+            t.classList.add('flex');
+            lucide.createIcons();
+            clearTimeout(toastTimer);
             toastTimer = setTimeout(() => {
-                toast.classList.add('hidden');
-                toast.classList.remove('flex');
-            }, 2600);
+                t.classList.add('hidden');
+                t.classList.remove('flex');
+            }, 2500);
         }
     </script>
 </body>
