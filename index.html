@@ -107,10 +107,10 @@
     <!-- Main Content -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-        <!-- Summary KPI Cards -->
-        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 sm:gap-4">
-            <!-- Card 1: Total Members & Status Counters Card -->
-            <div class="bg-gradient-to-br from-white to-indigo-50/70 rounded-2xl border border-indigo-200 p-4 shadow-xs flex flex-col justify-between">
+        <!-- Summary KPI Cards (Left Fixed Card + Right 13-Card Carousel) -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-4 items-stretch">
+            <!-- Card 1: Fixed Total Members & Status Counters Card (Left) -->
+            <div class="lg:col-span-5 bg-gradient-to-br from-white to-indigo-50/70 rounded-2xl border border-indigo-200 p-4 shadow-xs flex flex-col justify-between">
                 <div>
                     <div class="flex items-center justify-between">
                         <span id="cardTitleTotal" class="text-xs font-bold uppercase tracking-wider text-indigo-900">Total Members &amp; Stages</span>
@@ -134,165 +134,428 @@
                 <div id="breakdownMembers" class="mt-3 pt-2.5 border-t border-indigo-100 grid grid-cols-2 gap-1.5"></div>
             </div>
 
-            <!-- Card 2: Combined 303, 305 & 309 Complete + Overall Progress -->
-            <div class="bg-gradient-to-br from-white to-amber-50/70 rounded-2xl border border-amber-200 p-4 shadow-xs flex flex-col justify-between">
-                <div>
-                    <div class="flex items-center justify-between">
-                        <span id="cardTitleSummary" class="text-xs font-bold uppercase tracking-wider text-amber-900">303, 305 &amp; 309 Summary</span>
-                        <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
-                            <i data-lucide="award" class="w-4 h-4"></i>
-                        </span>
+            <!-- Right Column: 13-Card Summary Carousel Container -->
+            <div class="lg:col-span-7 flex flex-col justify-between gap-2">
+                <!-- Carousel Header Controls -->
+                <div class="flex items-center justify-between gap-2 bg-white/90 border border-slate-200 rounded-xl px-2.5 py-1.5 shadow-2xs">
+                    <div class="flex items-center gap-1.5 min-w-0">
+                        <button type="button" onclick="changeSummaryCarousel(-1)" title="Previous Summary Card" class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-indigo-100 text-slate-700 hover:text-indigo-800 flex items-center justify-center transition cursor-pointer shrink-0">
+                            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                        </button>
+                        <select id="summaryCarouselSelect" onchange="goToSummaryCarousel(parseInt(this.value, 10))" aria-label="Select Summary Card" class="text-xs font-bold text-slate-800 bg-transparent hover:bg-slate-50 rounded-lg px-1.5 py-1 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 cursor-pointer truncate max-w-[200px] sm:max-w-[280px]">
+                            <option value="0">1/13 • 303, 305 &amp; 309 Summary</option>
+                            <option value="1">2/13 • 309 Week</option>
+                            <option value="2">3/13 • 305 Week</option>
+                            <option value="3">4/13 • Bautisado</option>
+                            <option value="4">5/13 • WEEKS (Absent Badges)</option>
+                            <option value="5">6/13 • EF Week</option>
+                            <option value="6">7/13 • 304 Approved (304 Week)</option>
+                            <option value="7">8/13 • Baptism: On hold</option>
+                            <option value="8">9/13 • For Final Screening</option>
+                            <option value="9">10/13 • Baptism: Pending</option>
+                            <option value="10">11/13 • 304: Pending</option>
+                            <option value="11">12/13 • EF: Pending</option>
+                            <option value="12">13/13 • For ≤304</option>
+                        </select>
+                        <button type="button" onclick="changeSummaryCarousel(1)" title="Next Summary Card" class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-indigo-100 text-slate-700 hover:text-indigo-800 flex items-center justify-center transition cursor-pointer shrink-0">
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </button>
                     </div>
-                    <div class="mt-2">
-                        <div class="flex items-baseline justify-between">
-                            <div>
-                                <span id="statAvg309" class="text-2xl font-extrabold text-slate-900">0%</span>
-                                <span class="text-[11px] font-bold text-amber-700 ml-1">Overall Combined</span>
+                    <!-- Carousel Indicator Dots -->
+                    <div id="summaryCarouselDots" class="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5 px-1"></div>
+                </div>
+
+                <!-- Carousel Slides Wrapper -->
+                <div class="flex-1 relative">
+                    <!-- Slide 0: Combined 303, 305 & 309 Complete + Overall Progress -->
+                    <div data-carousel-slide="0" onclick="openSummaryCardModal('SUMMARY_303_305_309')" class="summary-carousel-slide h-full bg-gradient-to-br from-white to-amber-50/70 rounded-2xl border border-amber-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-amber-400 hover:shadow-md transition">
+                        <div>
+                            <div class="flex items-center justify-between">
+                                <div><span id="cardTitleSummary" class="text-xs font-bold uppercase tracking-wider text-amber-900 block">303, 305 &amp; 309 Summary</span><span class="text-[9px] text-slate-400 italic">Click card to expand per Purok</span></div>
+                                <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                                    <i data-lucide="award" class="w-4 h-4"></i>
+                                </span>
                             </div>
-                            <span id="statTotal309Counts" class="text-[11px] text-slate-500 font-semibold">0 / 0 total</span>
-                        </div>
-                        <div class="w-full h-1.5 bg-amber-100 rounded-full overflow-hidden mt-1">
-                            <div id="statBar309Overall" class="h-full bg-amber-500 rounded-full transition-all" style="width: 0%"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-3 grid grid-cols-3 gap-2 text-center">
-                    <div class="bg-white/90 border border-amber-200 rounded-xl px-2 py-2 shadow-2xs flex flex-col justify-between">
-                        <div class="text-[10px] font-extrabold uppercase text-amber-800">303 Done</div>
-                        <div id="stat303CompletePct" class="text-base font-extrabold text-slate-900 mt-0.5">0%</div>
-                        <div id="stat303CompleteShort" class="text-[10px] font-bold text-amber-800 bg-amber-50 rounded px-1 py-0.5 mt-1 leading-tight">0 / 0 members</div>
-                    </div>
-                    <div class="bg-white/90 border border-purple-200 rounded-xl px-2 py-2 shadow-2xs flex flex-col justify-between">
-                        <div class="text-[10px] font-extrabold uppercase text-purple-800">305 Done</div>
-                        <div id="stat305CompletePct" class="text-base font-extrabold text-slate-900 mt-0.5">0%</div>
-                        <div id="stat305CompleteShort" class="text-[10px] font-bold text-purple-800 bg-purple-50 rounded px-1 py-0.5 mt-1 leading-tight">0 / 0 members</div>
-                    </div>
-                    <div class="bg-white/90 border border-emerald-200 rounded-xl px-2 py-2 shadow-2xs flex flex-col justify-between">
-                        <div class="text-[10px] font-extrabold uppercase text-emerald-800">309 Done</div>
-                        <div id="stat309CompletePct" class="text-base font-extrabold text-slate-900 mt-0.5">0%</div>
-                        <div id="stat309CompleteShort" class="text-[10px] font-bold text-emerald-800 bg-emerald-50 rounded px-1 py-0.5 mt-1 leading-tight">0 / 0 members</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card 3: 309 Latest Week Card -->
-            <div onclick="openWeeklyModal('309')" class="bg-gradient-to-br from-white to-emerald-50/70 rounded-2xl border border-emerald-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-emerald-400 hover:shadow-md transition">
-                <div onclick="event.stopPropagation()">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-1.5">
-                            <button onclick="changeWeeklyOffset('309', -1)" title="Previous Week" class="w-6 h-6 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 flex items-center justify-center transition cursor-pointer">
-                                <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
-                            </button>
-                            <span id="stat309WeekTitle" class="text-xs font-bold uppercase tracking-wider text-emerald-900">309 Week —</span>
-                            <button id="nextBtn309" onclick="changeWeeklyOffset('309', 1)" title="Next Week" class="w-6 h-6 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 flex items-center justify-center transition cursor-pointer">
-                                <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-                            </button>
-                        </div>
-                        <span class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
-                            <i data-lucide="calendar-check-2" class="w-4 h-4"></i>
-                        </span>
-                    </div>
-                    <div class="mt-2 flex items-baseline gap-2">
-                        <span id="stat309WeekPct" class="text-2xl font-extrabold text-slate-900">0%</span>
-                        <span id="stat309WeekDetails" class="text-xs text-slate-500 font-semibold">0 / 0 members</span>
-                    </div>
-                    <!-- MW and WE Breakdown Pills -->
-                    <div class="mt-2 grid grid-cols-2 gap-1.5">
-                        <div class="bg-white/90 border border-emerald-200 rounded-lg px-2 py-1 flex items-center justify-between">
-                            <span class="text-[10px] font-extrabold text-emerald-800">MW</span>
-                            <span id="stat309MwSummary" class="text-[10px] font-bold text-slate-700">0% (0/0)</span>
-                        </div>
-                        <div class="bg-white/90 border border-teal-200 rounded-lg px-2 py-1 flex items-center justify-between">
-                            <span class="text-[10px] font-extrabold text-teal-800">WE</span>
-                            <span id="stat309WeSummary" class="text-[10px] font-bold text-slate-700">0% (0/0)</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-2.5 pt-2 border-t border-emerald-100">
-                    <div class="flex items-center justify-between mb-1">
-                        <span id="stat309MissingHeader" class="text-[10px] font-bold uppercase tracking-wider text-rose-700">ABSENTEE (<span id="stat309MissingCount">0</span>):</span>
-                        <span class="text-[9px] text-slate-400 italic">Click card to expand</span>
-                    </div>
-                    <div id="stat309MissingNames" class="text-[11px] text-slate-700 max-h-20 overflow-y-auto pr-1 space-y-0.5 leading-snug">
-                        <span class="text-slate-400 italic">No records yet</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card 4: 305 Latest Week Card -->
-            <div onclick="openWeeklyModal('305')" class="bg-gradient-to-br from-white to-purple-50/70 rounded-2xl border border-purple-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-purple-400 hover:shadow-md transition">
-                <div onclick="event.stopPropagation()">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-1.5">
-                            <button onclick="changeWeeklyOffset('305', -1)" title="Previous Week" class="w-6 h-6 rounded-lg bg-purple-100 hover:bg-purple-200 text-purple-800 flex items-center justify-center transition cursor-pointer">
-                                <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
-                            </button>
-                            <span id="stat305WeekTitle" class="text-xs font-bold uppercase tracking-wider text-purple-900">305 Week —</span>
-                            <button id="nextBtn305" onclick="changeWeeklyOffset('305', 1)" title="Next Week" class="w-6 h-6 rounded-lg bg-purple-100 hover:bg-purple-200 text-purple-800 flex items-center justify-center transition cursor-pointer">
-                                <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-                            </button>
-                        </div>
-                        <span class="w-8 h-8 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center">
-                            <i data-lucide="book-open-check" class="w-4 h-4"></i>
-                        </span>
-                    </div>
-                    <div class="mt-2 flex items-baseline gap-2">
-                        <span id="stat305WeekPct" class="text-2xl font-extrabold text-slate-900">0%</span>
-                        <span id="stat305WeekDetails" class="text-xs text-slate-500 font-semibold">0 / 0 Sinusubok</span>
-                    </div>
-                </div>
-                <div class="mt-2.5 pt-2 border-t border-purple-100">
-                    <div class="flex items-center justify-between mb-1">
-                        <span id="stat305MissingHeader" class="text-[10px] font-bold uppercase tracking-wider text-rose-700">Hindi na Pulong-Panalangin (<span id="stat305MissingCount">0</span>):</span>
-                        <span class="text-[9px] text-slate-400 italic">Click card to expand</span>
-                    </div>
-                    <div id="stat305MissingNames" class="text-[11px] text-slate-700 max-h-20 overflow-y-auto pr-1 space-y-0.5 leading-snug">
-                        <span class="text-slate-400 italic">No records yet</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Card 5: Bautisado Card (Split Top: Bautisado & Puroks | Bottom: Scrollable WEEKS Absent-Badge Members) -->
-            <div class="bg-gradient-to-br from-white to-sky-50/80 rounded-2xl border border-sky-200 p-4 shadow-xs flex flex-col justify-between hover:border-sky-400 hover:shadow-md transition">
-                <div onclick="openBaptismModal('ALL')" class="cursor-pointer">
-                    <div onclick="event.stopPropagation()">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-1.5">
-                                <button id="prevBtnBaptism" onclick="changeBaptismYear(-1)" title="Previous Year" class="w-6 h-6 rounded-lg bg-sky-100 hover:bg-sky-200 text-sky-800 flex items-center justify-center transition cursor-pointer">
-                                    <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
-                                </button>
-                                <span id="statBaptismYearTitle" class="text-xs font-bold uppercase tracking-wider text-sky-900">Bautisado 2026</span>
-                                <button id="nextBtnBaptism" onclick="changeBaptismYear(1)" title="Next Year" class="w-6 h-6 rounded-lg bg-sky-100 hover:bg-sky-200 text-sky-800 flex items-center justify-center transition cursor-pointer">
-                                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-                                </button>
+                            <div class="mt-2">
+                                <div class="flex items-baseline justify-between">
+                                    <div>
+                                        <span id="statAvg309" class="text-2xl font-extrabold text-slate-900">0%</span>
+                                        <span class="text-[11px] font-bold text-amber-700 ml-1">Overall Combined</span>
+                                    </div>
+                                    <span id="statTotal309Counts" class="text-[11px] text-slate-500 font-semibold">0 / 0 total</span>
+                                </div>
+                                <div class="w-full h-1.5 bg-amber-100 rounded-full overflow-hidden mt-1">
+                                    <div id="statBar309Overall" class="h-full bg-amber-500 rounded-full transition-all" style="width: 0%"></div>
+                                </div>
                             </div>
-                            <span class="w-8 h-8 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center">
-                                <i data-lucide="droplets" class="w-4 h-4"></i>
-                            </span>
                         </div>
-                        <div class="mt-2 flex items-baseline gap-2">
-                            <span id="statBaptismPct" class="text-2xl font-extrabold text-slate-900">0%</span>
-                            <span id="statBaptismDetails" class="text-xs text-slate-500 font-semibold">0 / 0 overall</span>
+                        <div class="mt-3 grid grid-cols-3 gap-2 text-center">
+                            <div class="bg-white/90 border border-amber-200 rounded-xl px-2 py-2 shadow-2xs flex flex-col justify-between">
+                                <div class="text-[10px] font-extrabold uppercase text-amber-800">303 Done</div>
+                                <div id="stat303CompletePct" class="text-base font-extrabold text-slate-900 mt-0.5">0%</div>
+                                <div id="stat303CompleteShort" class="text-[10px] font-bold text-amber-800 bg-amber-50 rounded px-1 py-0.5 mt-1 leading-tight">0 / 0 members</div>
+                            </div>
+                            <div class="bg-white/90 border border-purple-200 rounded-xl px-2 py-2 shadow-2xs flex flex-col justify-between">
+                                <div class="text-[10px] font-extrabold uppercase text-purple-800">305 Done</div>
+                                <div id="stat305CompletePct" class="text-base font-extrabold text-slate-900 mt-0.5">0%</div>
+                                <div id="stat305CompleteShort" class="text-[10px] font-bold text-purple-800 bg-purple-50 rounded px-1 py-0.5 mt-1 leading-tight">0 / 0 members</div>
+                            </div>
+                            <div class="bg-white/90 border border-emerald-200 rounded-xl px-2 py-2 shadow-2xs flex flex-col justify-between">
+                                <div class="text-[10px] font-extrabold uppercase text-emerald-800">309 Done</div>
+                                <div id="stat309CompletePct" class="text-base font-extrabold text-slate-900 mt-0.5">0%</div>
+                                <div id="stat309CompleteShort" class="text-[10px] font-bold text-emerald-800 bg-emerald-50 rounded px-1 py-0.5 mt-1 leading-tight">0 / 0 members</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="mt-2 pt-2 border-t border-sky-100">
-                        <div class="flex items-center justify-between mb-1">
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-sky-800">Purok w/ Bautisado:</span>
-                            <span class="text-[9px] text-slate-400 italic">Click Purok to view</span>
-                        </div>
-                        <div id="statBaptismPuroks" class="flex flex-wrap gap-1 max-h-12 overflow-y-auto pr-0.5">
-                            <span class="text-[11px] text-slate-400 italic">None for this year</span>
-                        </div>
-                    </div>
-                </div>
 
-                <div onclick="openWeeklyModal('ABSENT_WEEKS')" class="mt-2.5 pt-2 border-t-2 border-sky-200/80 cursor-pointer group" title="Click to expand & sort per Purok">
-                    <div class="flex items-center justify-between mb-1">
-                        <span class="text-[10px] font-extrabold uppercase tracking-wider text-red-900 group-hover:underline">WEEKS (<span id="statAbsentWeeksCount">0</span>):</span>
-                        <span class="text-[9px] text-slate-400 group-hover:text-sky-700 italic">Click card to expand</span>
+                    <!-- Slide 1: 309 Week Card -->
+                    <div data-carousel-slide="1" onclick="openWeeklyModal('309')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-emerald-50/70 rounded-2xl border border-emerald-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-emerald-400 hover:shadow-md transition">
+                        <div onclick="event.stopPropagation()">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-1.5">
+                                    <button onclick="changeWeeklyOffset('309', -1)" title="Previous Week" class="w-6 h-6 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 flex items-center justify-center transition cursor-pointer">
+                                        <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                    <span id="stat309WeekTitle" class="text-xs font-bold uppercase tracking-wider text-emerald-900">309 Week —</span>
+                                    <button id="nextBtn309" onclick="changeWeeklyOffset('309', 1)" title="Next Week" class="w-6 h-6 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 flex items-center justify-center transition cursor-pointer">
+                                        <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </div>
+                                <span class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                                    <i data-lucide="calendar-check-2" class="w-4 h-4"></i>
+                                </span>
+                            </div>
+                            <div class="mt-2 flex items-baseline gap-2">
+                                <span id="stat309WeekPct" class="text-2xl font-extrabold text-slate-900">0%</span>
+                                <span id="stat309WeekDetails" class="text-xs text-slate-500 font-semibold">0 / 0 members</span>
+                            </div>
+                            <div class="mt-2 grid grid-cols-2 gap-1.5">
+                                <div class="bg-white/90 border border-emerald-200 rounded-lg px-2 py-1 flex items-center justify-between">
+                                    <span class="text-[10px] font-extrabold text-emerald-800">MW</span>
+                                    <span id="stat309MwSummary" class="text-[10px] font-bold text-slate-700">0% (0/0)</span>
+                                </div>
+                                <div class="bg-white/90 border border-teal-200 rounded-lg px-2 py-1 flex items-center justify-between">
+                                    <span class="text-[10px] font-extrabold text-teal-800">WE</span>
+                                    <span id="stat309WeSummary" class="text-[10px] font-bold text-slate-700">0% (0/0)</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-2.5 pt-2 border-t border-emerald-100">
+                            <div class="flex items-center justify-between mb-1">
+                                <span id="stat309MissingHeader" class="text-[10px] font-bold uppercase tracking-wider text-rose-700">ABSENTEE (<span id="stat309MissingCount">0</span>):</span>
+                                <span class="text-[9px] text-slate-400 italic">Click card to expand</span>
+                            </div>
+                            <div id="stat309MissingNames" class="text-[11px] text-slate-700 max-h-24 overflow-y-auto pr-1 space-y-0.5 leading-snug">
+                                <span class="text-slate-400 italic">No records yet</span>
+                            </div>
+                        </div>
                     </div>
-                    <div id="statAbsentWeeksList" class="text-[11px] text-slate-700 max-h-20 overflow-y-auto pr-1 space-y-0.5 leading-snug">
-                        <span class="text-slate-400 italic">None with absent badge</span>
+
+                    <!-- Slide 2: 305 Week Card -->
+                    <div data-carousel-slide="2" onclick="openWeeklyModal('305')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-purple-50/70 rounded-2xl border border-purple-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-purple-400 hover:shadow-md transition">
+                        <div onclick="event.stopPropagation()">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-1.5">
+                                    <button onclick="changeWeeklyOffset('305', -1)" title="Previous Week" class="w-6 h-6 rounded-lg bg-purple-100 hover:bg-purple-200 text-purple-800 flex items-center justify-center transition cursor-pointer">
+                                        <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                    <span id="stat305WeekTitle" class="text-xs font-bold uppercase tracking-wider text-purple-900">305 Week —</span>
+                                    <button id="nextBtn305" onclick="changeWeeklyOffset('305', 1)" title="Next Week" class="w-6 h-6 rounded-lg bg-purple-100 hover:bg-purple-200 text-purple-800 flex items-center justify-center transition cursor-pointer">
+                                        <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </div>
+                                <span class="w-8 h-8 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center">
+                                    <i data-lucide="book-open-check" class="w-4 h-4"></i>
+                                </span>
+                            </div>
+                            <div class="mt-2 flex items-baseline gap-2">
+                                <span id="stat305WeekPct" class="text-2xl font-extrabold text-slate-900">0%</span>
+                                <span id="stat305WeekDetails" class="text-xs text-slate-500 font-semibold">0 / 0 Sinusubok</span>
+                            </div>
+                        </div>
+                        <div class="mt-2.5 pt-2 border-t border-purple-100">
+                            <div class="flex items-center justify-between mb-1">
+                                <span id="stat305MissingHeader" class="text-[10px] font-bold uppercase tracking-wider text-rose-700">Hindi na Pulong-Panalangin (<span id="stat305MissingCount">0</span>):</span>
+                                <span class="text-[9px] text-slate-400 italic">Click card to expand</span>
+                            </div>
+                            <div id="stat305MissingNames" class="text-[11px] text-slate-700 max-h-24 overflow-y-auto pr-1 space-y-0.5 leading-snug">
+                                <span class="text-slate-400 italic">No records yet</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 3: Bautisado Card (Standalone) -->
+                    <div data-carousel-slide="3" onclick="openBaptismModal('ALL')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-sky-50/80 rounded-2xl border border-sky-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-sky-400 hover:shadow-md transition">
+                        <div onclick="event.stopPropagation()">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-1.5">
+                                    <button id="prevBtnBaptism" onclick="changeBaptismYear(-1)" title="Previous Year" class="w-6 h-6 rounded-lg bg-sky-100 hover:bg-sky-200 text-sky-800 flex items-center justify-center transition cursor-pointer">
+                                        <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                    <span id="statBaptismYearTitle" class="text-xs font-bold uppercase tracking-wider text-sky-900">Bautisado 2026</span>
+                                    <button id="nextBtnBaptism" onclick="changeBaptismYear(1)" title="Next Year" class="w-6 h-6 rounded-lg bg-sky-100 hover:bg-sky-200 text-sky-800 flex items-center justify-center transition cursor-pointer">
+                                        <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </div>
+                                <span class="w-8 h-8 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center">
+                                    <i data-lucide="droplets" class="w-4 h-4"></i>
+                                </span>
+                            </div>
+                            <div class="mt-2 flex items-baseline gap-2">
+                                <span id="statBaptismPct" class="text-2xl font-extrabold text-slate-900">0%</span>
+                                <span id="statBaptismDetails" class="text-xs text-slate-500 font-semibold">0 / 0 overall</span>
+                            </div>
+                        </div>
+                        <div class="mt-2.5 pt-2 border-t border-sky-100">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-sky-800">Purok w/ Bautisado:</span>
+                                <span class="text-[9px] text-slate-400 italic">Click Purok or card to view</span>
+                            </div>
+                            <div id="statBaptismPuroks" class="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto pr-0.5">
+                                <span class="text-[11px] text-slate-400 italic">None for this year</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 4: WEEKS (Absent-Badge Members Standalone Card) -->
+                    <div data-carousel-slide="4" onclick="openWeeklyModal('ABSENT_WEEKS')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-red-50/70 rounded-2xl border border-red-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-red-400 hover:shadow-md transition">
+                        <div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-extrabold uppercase tracking-wider text-red-900">WEEKS (Absent Badges)</span>
+                                <span class="w-8 h-8 rounded-lg bg-red-100 text-red-800 flex items-center justify-center shrink-0">
+                                    <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                                </span>
+                            </div>
+                            <div class="mt-2 flex items-baseline gap-2">
+                                <span id="statAbsentWeeksCount" class="text-2xl font-extrabold text-slate-900">0</span>
+                                <span class="text-xs text-slate-500 font-semibold">members with consecutive absent weeks</span>
+                            </div>
+                        </div>
+                        <div class="mt-2.5 pt-2 border-t border-red-100">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-red-800">List of Members:</span>
+                                <span class="text-[9px] text-slate-400 italic">Click card to expand</span>
+                            </div>
+                            <div id="statAbsentWeeksList" class="text-[11px] text-slate-700 max-h-24 overflow-y-auto pr-1 space-y-0.5 leading-snug">
+                                <span class="text-slate-400 italic">None with absent badge</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 5: EF Week Card -->
+                    <div data-carousel-slide="5" onclick="openSummaryCardModal('EF_WEEK')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-emerald-50/80 rounded-2xl border border-emerald-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-emerald-400 hover:shadow-md transition">
+                        <div onclick="event.stopPropagation()">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-1.5">
+                                    <button type="button" onclick="changeWeeklyOffset('EF', -1)" title="Previous Week" class="w-6 h-6 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 flex items-center justify-center transition cursor-pointer">
+                                        <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                    <span id="statEfWeekTitle" class="text-xs font-bold uppercase tracking-wider text-emerald-900">EF Week —</span>
+                                    <button type="button" id="nextBtnEF" onclick="changeWeeklyOffset('EF', 1)" title="Next Week" class="w-6 h-6 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 flex items-center justify-center transition cursor-pointer">
+                                        <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </div>
+                                <span class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                                    <i data-lucide="file-check-2" class="w-4 h-4"></i>
+                                </span>
+                            </div>
+                            <div class="mt-2 flex items-baseline gap-2">
+                                <span id="statEfWeekCount" class="text-2xl font-extrabold text-slate-900">0</span>
+                                <span id="statEfWeekSubtitle" class="text-xs text-slate-500 font-semibold">EF Approved in Week —</span>
+                            </div>
+                        </div>
+                        <div class="mt-2.5 pt-2 border-t border-emerald-100">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-800">Approved Members:</span>
+                                <span class="text-[9px] text-slate-400 italic">Click card to expand</span>
+                            </div>
+                            <div id="statEfWeekList" class="text-[11px] text-slate-700 max-h-24 overflow-y-auto pr-1 space-y-0.5 leading-snug">
+                                <span class="text-slate-400 italic">No EF approved for this week</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 6: 304 Approved (304 Week) Card -->
+                    <div data-carousel-slide="6" onclick="openSummaryCardModal('W304_WEEK')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-violet-50/80 rounded-2xl border border-violet-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-violet-400 hover:shadow-md transition">
+                        <div onclick="event.stopPropagation()">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-1.5">
+                                    <button type="button" onclick="changeWeeklyOffset('304', -1)" title="Previous Week" class="w-6 h-6 rounded-lg bg-violet-100 hover:bg-violet-200 text-violet-800 flex items-center justify-center transition cursor-pointer">
+                                        <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                    <span id="stat304WeekTitle" class="text-xs font-bold uppercase tracking-wider text-violet-900">304 Approved • Week —</span>
+                                    <button type="button" id="nextBtn304" onclick="changeWeeklyOffset('304', 1)" title="Next Week" class="w-6 h-6 rounded-lg bg-violet-100 hover:bg-violet-200 text-violet-800 flex items-center justify-center transition cursor-pointer">
+                                        <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                    </button>
+                                </div>
+                                <span class="w-8 h-8 rounded-lg bg-violet-100 text-violet-700 flex items-center justify-center shrink-0">
+                                    <i data-lucide="badge-check" class="w-4 h-4"></i>
+                                </span>
+                            </div>
+                            <div class="mt-2 flex items-baseline gap-2">
+                                <span id="stat304WeekCount" class="text-2xl font-extrabold text-slate-900">0</span>
+                                <span id="stat304WeekSubtitle" class="text-xs text-slate-500 font-semibold">304 Approved in Week —</span>
+                            </div>
+                        </div>
+                        <div class="mt-2.5 pt-2 border-t border-violet-100">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-violet-800">Approved Members:</span>
+                                <span class="text-[9px] text-slate-400 italic">Click card to expand</span>
+                            </div>
+                            <div id="stat304WeekList" class="text-[11px] text-slate-700 max-h-24 overflow-y-auto pr-1 space-y-0.5 leading-snug">
+                                <span class="text-slate-400 italic">No 304 approved for this week</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 7: Baptism: On hold -->
+                    <div data-carousel-slide="7" onclick="openSummaryCardModal('BAPTISM_ON_HOLD')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-amber-50/80 rounded-2xl border border-amber-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-amber-400 hover:shadow-md transition">
+                        <div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold uppercase tracking-wider text-amber-900">Baptism: On hold</span>
+                                <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                                    <i data-lucide="pause-circle" class="w-4 h-4"></i>
+                                </span>
+                            </div>
+                            <div class="mt-2 flex items-baseline gap-2">
+                                <span id="statCardBaptismOnHoldCount" class="text-2xl font-extrabold text-slate-900">0</span>
+                                <span class="text-xs text-slate-500 font-semibold">members on hold</span>
+                            </div>
+                        </div>
+                        <div class="mt-2.5 pt-2 border-t border-amber-100">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-800">Members List:</span>
+                                <div class="flex items-center gap-2"><span class="text-[9px] text-slate-400 italic">Click card to expand</span><button type="button" onclick="event.stopPropagation(); filterByStatusCounter('BaptismOnHold', 'ALL')" class="text-[9px] font-bold text-amber-700 hover:underline cursor-pointer">Filter table</button></div>
+                            </div>
+                            <div id="statCardBaptismOnHoldList" class="text-[11px] text-slate-700 max-h-24 overflow-y-auto pr-1 space-y-0.5 leading-snug">
+                                <span class="text-slate-400 italic">None on hold</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 8: For Final Screening (with MM/DD date) -->
+                    <div data-carousel-slide="8" onclick="openSummaryCardModal('FINAL_SCREENING')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-indigo-50/80 rounded-2xl border border-indigo-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-indigo-400 hover:shadow-md transition">
+                        <div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold uppercase tracking-wider text-indigo-900">For Final Screening</span>
+                                <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
+                                    <i data-lucide="calendar-clock" class="w-4 h-4"></i>
+                                </span>
+                            </div>
+                            <div class="mt-2 flex items-baseline gap-2">
+                                <span id="statCardFinalScreeningCount" class="text-2xl font-extrabold text-slate-900">0</span>
+                                <span class="text-xs text-slate-500 font-semibold">scheduled for final screening</span>
+                            </div>
+                        </div>
+                        <div class="mt-2.5 pt-2 border-t border-indigo-100">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-800">Members &amp; Date (MM/DD):</span>
+                                <div class="flex items-center gap-2"><span class="text-[9px] text-slate-400 italic">Click card to expand</span><button type="button" onclick="event.stopPropagation(); filterByStatusCounter('BaptismFinalScreening', 'ALL')" class="text-[9px] font-bold text-indigo-700 hover:underline cursor-pointer">Filter table</button></div>
+                            </div>
+                            <div id="statCardFinalScreeningList" class="text-[11px] text-slate-700 max-h-24 overflow-y-auto pr-1 space-y-0.5 leading-snug">
+                                <span class="text-slate-400 italic">None for final screening</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 9: Baptism: Pending -->
+                    <div data-carousel-slide="9" onclick="openSummaryCardModal('BAPTISM_PENDING')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-sky-50/80 rounded-2xl border border-sky-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-sky-400 hover:shadow-md transition">
+                        <div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold uppercase tracking-wider text-sky-900">Baptism: Pending</span>
+                                <span class="w-8 h-8 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
+                                    <i data-lucide="hourglass" class="w-4 h-4"></i>
+                                </span>
+                            </div>
+                            <div class="mt-2 flex items-baseline gap-2">
+                                <span id="statCardBaptismPendingCount" class="text-2xl font-extrabold text-slate-900">0</span>
+                                <span class="text-xs text-slate-500 font-semibold">for baptism (pending)</span>
+                            </div>
+                        </div>
+                        <div class="mt-2.5 pt-2 border-t border-sky-100">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-sky-800">Members List:</span>
+                                <div class="flex items-center gap-2"><span class="text-[9px] text-slate-400 italic">Click card to expand</span><button type="button" onclick="event.stopPropagation(); filterByStatusCounter('BaptismPending', 'ALL')" class="text-[9px] font-bold text-sky-700 hover:underline cursor-pointer">Filter table</button></div>
+                            </div>
+                            <div id="statCardBaptismPendingList" class="text-[11px] text-slate-700 max-h-24 overflow-y-auto pr-1 space-y-0.5 leading-snug">
+                                <span class="text-slate-400 italic">None pending</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 10: 304: Pending -->
+                    <div data-carousel-slide="10" onclick="openSummaryCardModal('PENDING_304')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-purple-50/80 rounded-2xl border border-purple-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-purple-400 hover:shadow-md transition">
+                        <div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold uppercase tracking-wider text-purple-900">304: Pending</span>
+                                <span class="w-8 h-8 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center shrink-0">
+                                    <i data-lucide="clock" class="w-4 h-4"></i>
+                                </span>
+                            </div>
+                            <div class="mt-2 flex items-baseline gap-2">
+                                <span id="statCard304PendingCount" class="text-2xl font-extrabold text-slate-900">0</span>
+                                <span class="text-xs text-slate-500 font-semibold">Sinusubok with pending 304</span>
+                            </div>
+                        </div>
+                        <div class="mt-2.5 pt-2 border-t border-purple-100">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-purple-800">Members List:</span>
+                                <div class="flex items-center gap-2"><span class="text-[9px] text-slate-400 italic">Click card to expand</span><button type="button" onclick="event.stopPropagation(); filterByStatusCounter('Pending304', 'ALL')" class="text-[9px] font-bold text-purple-700 hover:underline cursor-pointer">Filter table</button></div>
+                            </div>
+                            <div id="statCard304PendingList" class="text-[11px] text-slate-700 max-h-24 overflow-y-auto pr-1 space-y-0.5 leading-snug">
+                                <span class="text-slate-400 italic">None pending</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 11: EF: Pending -->
+                    <div data-carousel-slide="11" onclick="openSummaryCardModal('EF_PENDING')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-teal-50/80 rounded-2xl border border-teal-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-teal-400 hover:shadow-md transition">
+                        <div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold uppercase tracking-wider text-teal-900">EF: Pending</span>
+                                <span class="w-8 h-8 rounded-lg bg-teal-100 text-teal-700 flex items-center justify-center shrink-0">
+                                    <i data-lucide="file-clock" class="w-4 h-4"></i>
+                                </span>
+                            </div>
+                            <div class="mt-2 flex items-baseline gap-2">
+                                <span id="statCardEfPendingCount" class="text-2xl font-extrabold text-slate-900">0</span>
+                                <span class="text-xs text-slate-500 font-semibold">members with pending EF</span>
+                            </div>
+                        </div>
+                        <div class="mt-2.5 pt-2 border-t border-teal-100">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-teal-800">Members List:</span>
+                                <div class="flex items-center gap-2"><span class="text-[9px] text-slate-400 italic">Click card to expand</span><button type="button" onclick="event.stopPropagation(); filterByStatusCounter('ALL', 'Pending')" class="text-[9px] font-bold text-teal-700 hover:underline cursor-pointer">Filter table</button></div>
+                            </div>
+                            <div id="statCardEfPendingList" class="text-[11px] text-slate-700 max-h-24 overflow-y-auto pr-1 space-y-0.5 leading-snug">
+                                <span class="text-slate-400 italic">None pending</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 12: For ≤304 -->
+                    <div data-carousel-slide="12" onclick="openSummaryCardModal('FOR_304')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-cyan-50/80 rounded-2xl border border-cyan-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-cyan-400 hover:shadow-md transition">
+                        <div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold uppercase tracking-wider text-cyan-900">For ≤304</span>
+                                <span class="w-8 h-8 rounded-lg bg-cyan-100 text-cyan-700 flex items-center justify-center shrink-0">
+                                    <i data-lucide="list-checks" class="w-4 h-4"></i>
+                                </span>
+                            </div>
+                            <div class="mt-2 flex items-baseline gap-2">
+                                <span id="statCardFor304Count" class="text-2xl font-extrabold text-slate-900">0</span>
+                                <span class="text-xs text-slate-500 font-semibold">≤5 lessons left in 303</span>
+                            </div>
+                        </div>
+                        <div class="mt-2.5 pt-2 border-t border-cyan-100">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-cyan-800">Members List (303 Progress):</span>
+                                <div class="flex items-center gap-2"><span class="text-[9px] text-slate-400 italic">Click card to expand</span><button type="button" onclick="event.stopPropagation(); filterByStatusCounter('PreScreening', 'ALL')" class="text-[9px] font-bold text-cyan-700 hover:underline cursor-pointer">Filter table</button></div>
+                            </div>
+                            <div id="statCardFor304List" class="text-[11px] text-slate-700 max-h-24 overflow-y-auto pr-1 space-y-0.5 leading-snug">
+                                <span class="text-slate-400 italic">None in ≤5 left</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -807,6 +1070,57 @@
         </div>
     </div>
 
+    <!-- Generic Summary Card Expand Modal (with Purok Filter & Week Controls) -->
+    <div id="summaryCardModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden border border-slate-100 flex flex-col max-h-[85vh]">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <div id="summaryCardModalIcon" class="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
+                        <i data-lucide="list-checks" class="w-5 h-5"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h3 id="summaryCardModalTitle" class="text-base font-bold text-slate-900 truncate">Summary Details</h3>
+                        <p id="summaryCardModalSubtitle" class="text-xs text-slate-500 truncate">Filtered view per Purok</p>
+                    </div>
+                </div>
+                <button onclick="closeSummaryCardModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 cursor-pointer shrink-0"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="px-6 py-3.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between gap-2 flex-wrap shrink-0">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                    <div id="summaryCardModalWeekControls" class="hidden items-center gap-1.5">
+                        <button type="button" onclick="changeSummaryCardModalWeek(-1)" class="px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer flex items-center gap-1">
+                            <i data-lucide="chevron-left" class="w-3.5 h-3.5"></i> Prev
+                        </button>
+                        <button type="button" id="summaryCardModalNextWeekBtn" onclick="changeSummaryCardModalWeek(1)" class="px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer flex items-center gap-1">
+                            Next <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                    <select id="summaryCardModalPurokFilter" onchange="setSummaryCardModalPurok(this.value)" class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700 focus:outline-none">
+                        <option value="ALL">All Puroks</option>
+                        <option value="PUROK 1">PUROK 1</option>
+                        <option value="PUROK 2">PUROK 2</option>
+                        <option value="PUROK 3">PUROK 3</option>
+                        <option value="PUROK 4">PUROK 4</option>
+                        <option value="PUROK 5">PUROK 5</option>
+                        <option value="PUROK 6A">PUROK 6A</option>
+                        <option value="PUROK 6B">PUROK 6B</option>
+                        <option value="PUROK 7">PUROK 7</option>
+                        <option value="PUROK 8">PUROK 8</option>
+                    </select>
+                </div>
+                <div class="text-right">
+                    <span id="summaryCardModalCountBadge" class="px-2.5 py-1 rounded-lg bg-slate-900 text-white text-xs font-extrabold">0 members</span>
+                </div>
+            </div>
+            <div class="p-6 overflow-y-auto flex-1 space-y-3" id="summaryCardModalBody">
+            </div>
+            <div class="px-6 py-3.5 border-t border-slate-100 bg-slate-50 flex items-center justify-between shrink-0">
+                <span class="text-[11px] text-slate-500 italic">Click a member to open progress</span>
+                <button type="button" onclick="closeSummaryCardModal()" class="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold cursor-pointer">Close</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Quick Remarks / Notes Modal -->
     <div id="notesModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-100 flex flex-col">
@@ -1025,8 +1339,14 @@
         let activeNotesMemberId = null;
         let weekOffset309 = -1;
         let weekOffset305 = -1;
+        let weekOffsetEF = 0;
+        let weekOffset304 = 0;
+        let activeSummarySlideIndex = 0;
+        const TOTAL_SUMMARY_SLIDES = 13;
         let selectedBaptismYear = new Date().getFullYear();
         let activeBaptismModalPurok = 'ALL';
+        let activeSummaryCardModalType = null;
+        let activeSummaryCardModalPurok = 'ALL';
         let editingPurokKey = null;
         let isSyncingFromCloud = false;
         let isSavingToCloud = false;
@@ -1687,6 +2007,309 @@
             }
         }
 
+        function openSummaryCardModal(cardType) {
+            activeSummaryCardModalType = cardType;
+            activeSummaryCardModalPurok = selectedPurok || 'ALL';
+            const selectEl = document.getElementById('summaryCardModalPurokFilter');
+            if (selectEl) selectEl.value = activeSummaryCardModalPurok;
+            renderSummaryCardModalContent();
+            const modal = document.getElementById('summaryCardModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function closeSummaryCardModal() {
+            const modal = document.getElementById('summaryCardModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            activeSummaryCardModalType = null;
+        }
+
+        function setSummaryCardModalPurok(purokVal) {
+            activeSummaryCardModalPurok = purokVal || 'ALL';
+            renderSummaryCardModalContent();
+        }
+
+        function changeSummaryCardModalWeek(delta) {
+            if (!activeSummaryCardModalType) return;
+            if (activeSummaryCardModalType === 'EF_WEEK') {
+                changeWeeklyOffset('EF', delta);
+            } else if (activeSummaryCardModalType === 'W304_WEEK') {
+                changeWeeklyOffset('304', delta);
+            }
+            renderSummaryCardModalContent();
+        }
+
+        function renderSummaryCardModalContent() {
+            if (!activeSummaryCardModalType) return;
+            const currentWeekNum = getIsoWeekNumber(new Date());
+            const activeMembers = members.filter(m => !isMemberArchivedOrTigil(m));
+            const modalPurok = activeSummaryCardModalPurok || 'ALL';
+            const scopeMembers = modalPurok === 'ALL' ? activeMembers : activeMembers.filter(m => m.purok === modalPurok);
+            const scopeTitle = modalPurok === 'ALL' ? 'All Puroks' : modalPurok;
+
+            const titleEl = document.getElementById('summaryCardModalTitle');
+            const subEl = document.getElementById('summaryCardModalSubtitle');
+            const iconEl = document.getElementById('summaryCardModalIcon');
+            const weekCtrlEl = document.getElementById('summaryCardModalWeekControls');
+            const nextWeekBtn = document.getElementById('summaryCardModalNextWeekBtn');
+            const countBadgeEl = document.getElementById('summaryCardModalCountBadge');
+            const bodyEl = document.getElementById('summaryCardModalBody');
+
+            if (weekCtrlEl) {
+                weekCtrlEl.classList.add('hidden');
+                weekCtrlEl.classList.remove('flex');
+            }
+
+            if (activeSummaryCardModalType === 'SUMMARY_303_305_309') {
+                const total = scopeMembers.length;
+                let sum303 = 0, sum305 = 0, sum309 = 0;
+                let done303 = 0, done305 = 0, done309 = 0;
+
+                scopeMembers.forEach(m => {
+                    const c303 = Math.min(30, Object.keys(getL303Map(m)).length);
+                    const c305 = Math.min(15, Object.keys(m.l305 || {}).length);
+                    const c309 = getMember309TotalCount(m);
+                    sum303 += c303;
+                    sum305 += c305;
+                    sum309 += c309;
+                    if (c303 >= 30) done303++;
+                    if (c305 >= 15) done305++;
+                    if (c309 >= 48) done309++;
+                });
+
+                const max303 = total * 30;
+                const max305 = total * 15;
+                const max309 = total * 48;
+                const maxAll = max303 + max305 + max309;
+                const sumAll = sum303 + sum305 + sum309;
+                const overallPct = maxAll > 0 ? Math.round((sumAll / maxAll) * 100) : 0;
+                const pct303 = max303 > 0 ? Math.round((sum303 / max303) * 100) : 0;
+                const pct305 = max305 > 0 ? Math.round((sum305 / max305) * 100) : 0;
+                const pct309 = max309 > 0 ? Math.round((sum309 / max309) * 100) : 0;
+
+                titleEl.textContent = `303, 305 & 309 Summary (${scopeTitle})`;
+                subEl.textContent = `Overall combined progress: ${overallPct}% (${sumAll} / ${maxAll})`;
+                iconEl.className = 'w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0';
+                iconEl.innerHTML = `<i data-lucide="award" class="w-5 h-5"></i>`;
+                countBadgeEl.textContent = `${total} ${total === 1 ? 'member' : 'members'}`;
+
+                const sortedMembers = [...scopeMembers].sort((a, b) => {
+                    const pA = PUROK_LIST.indexOf(a.purok);
+                    const pB = PUROK_LIST.indexOf(b.purok);
+                    if (pA !== pB) return pA - pB;
+                    return (a.fullName || '').localeCompare(b.fullName || '');
+                });
+
+                const headerCardsHtml = `
+                    <div class="grid grid-cols-3 gap-2 text-center">
+                        <div class="bg-amber-50/80 border border-amber-200 rounded-xl p-2.5">
+                            <div class="text-[10px] font-extrabold uppercase text-amber-800">303 Done</div>
+                            <div class="text-lg font-extrabold text-slate-900 mt-0.5">${pct303}%</div>
+                            <div class="text-[10px] font-bold text-amber-900 mt-0.5">${done303} / ${total}</div>
+                        </div>
+                        <div class="bg-purple-50/80 border border-purple-200 rounded-xl p-2.5">
+                            <div class="text-[10px] font-extrabold uppercase text-purple-800">305 Done</div>
+                            <div class="text-lg font-extrabold text-slate-900 mt-0.5">${pct305}%</div>
+                            <div class="text-[10px] font-bold text-purple-900 mt-0.5">${done305} / ${total}</div>
+                        </div>
+                        <div class="bg-emerald-50/80 border border-emerald-200 rounded-xl p-2.5">
+                            <div class="text-[10px] font-extrabold uppercase text-emerald-800">309 Done</div>
+                            <div class="text-lg font-extrabold text-slate-900 mt-0.5">${pct309}%</div>
+                            <div class="text-[10px] font-bold text-emerald-900 mt-0.5">${done309} / ${total}</div>
+                        </div>
+                    </div>
+                `;
+
+                if (sortedMembers.length === 0) {
+                    bodyEl.innerHTML = headerCardsHtml + `<div class="p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-500 text-center">Walang active member sa ${scopeTitle}.</div>`;
+                } else {
+                    const rowsHtml = sortedMembers.map((m, idx) => {
+                        const c303 = Math.min(30, Object.keys(getL303Map(m)).length);
+                        const c305 = Math.min(15, Object.keys(m.l305 || {}).length);
+                        const c309 = getMember309TotalCount(m);
+                        const theme = PUROK_THEMES[m.purok] || { badge: 'bg-slate-100 text-slate-800' };
+                        return `
+                            <div onclick="closeSummaryCardModal(); openProgressModal('${m.id}')" class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 p-2.5 bg-slate-50 hover:bg-amber-50/70 border border-slate-200 hover:border-amber-300 rounded-xl cursor-pointer transition">
+                                <div class="flex items-start gap-2 min-w-0">
+                                    <span class="text-[11px] font-extrabold text-slate-400 w-5 shrink-0 mt-0.5">${idx + 1}.</span>
+                                    <div class="min-w-0">
+                                        <div class="text-xs font-bold text-slate-900 break-words leading-snug">${escapeHtml(m.fullName)}</div>
+                                        <div class="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                                            <span class="px-1.5 py-0.2 rounded text-[9px] font-extrabold border ${theme.badge}">${escapeHtml(m.purok)}</span>
+                                            <span class="text-[10px] font-semibold text-slate-500">${escapeHtml(m.purokGrupo)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1 shrink-0 pl-7 sm:pl-0 flex-wrap">
+                                    <span class="px-1.5 py-0.5 rounded text-[10px] font-extrabold ${c303 >= 30 ? 'bg-amber-600 text-white' : 'bg-amber-100 text-amber-900'}">303: ${c303}/30</span>
+                                    <span class="px-1.5 py-0.5 rounded text-[10px] font-extrabold ${c305 >= 15 ? 'bg-purple-600 text-white' : 'bg-purple-100 text-purple-900'}">305: ${c305}/15</span>
+                                    <span class="px-1.5 py-0.5 rounded text-[10px] font-extrabold ${c309 >= 48 ? 'bg-emerald-600 text-white' : 'bg-emerald-100 text-emerald-900'}">309: ${c309}/48</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                    bodyEl.innerHTML = headerCardsHtml + `<div class="space-y-1.5">${rowsHtml}</div>`;
+                }
+                lucide.createIcons();
+                return;
+            }
+
+            let listItems = [];
+            let emptyMessage = 'No records found.';
+            let extraBadgeFn = null;
+
+            switch (activeSummaryCardModalType) {
+                case 'EF_WEEK': {
+                    const targetWeekEF = Math.max(1, currentWeekNum + weekOffsetEF);
+                    titleEl.textContent = `EF Approved • Week ${targetWeekEF} (${scopeTitle})`;
+                    subEl.textContent = `Members with EF approved in Week ${targetWeekEF}`;
+                    iconEl.className = 'w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0';
+                    iconEl.innerHTML = `<i data-lucide="file-check-2" class="w-5 h-5"></i>`;
+                    if (weekCtrlEl) {
+                        weekCtrlEl.classList.remove('hidden');
+                        weekCtrlEl.classList.add('flex');
+                    }
+                    if (nextWeekBtn) {
+                        nextWeekBtn.style.opacity = weekOffsetEF >= 0 ? '0.3' : '1';
+                        nextWeekBtn.style.pointerEvents = weekOffsetEF >= 0 ? 'none' : 'auto';
+                    }
+                    listItems = scopeMembers.filter(m => (m.efStatus || 'Approved') === 'Approved' && extractWeekNumber(m.efRef || '') === targetWeekEF);
+                    emptyMessage = `Walang EF Approved sa ${scopeTitle} para sa Week ${targetWeekEF}.`;
+                    extraBadgeFn = m => m.efRef ? `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">${escapeHtml(m.efRef)}</span>` : '';
+                    break;
+                }
+                case 'W304_WEEK': {
+                    const targetWeek304 = Math.max(1, currentWeekNum + weekOffset304);
+                    titleEl.textContent = `304 Approved • Week ${targetWeek304} (${scopeTitle})`;
+                    subEl.textContent = `Sinusubok members with 304 approved in Week ${targetWeek304}`;
+                    iconEl.className = 'w-9 h-9 rounded-xl bg-violet-100 text-violet-700 flex items-center justify-center shrink-0';
+                    iconEl.innerHTML = `<i data-lucide="badge-check" class="w-5 h-5"></i>`;
+                    if (weekCtrlEl) {
+                        weekCtrlEl.classList.remove('hidden');
+                        weekCtrlEl.classList.add('flex');
+                    }
+                    if (nextWeekBtn) {
+                        nextWeekBtn.style.opacity = weekOffset304 >= 0 ? '0.3' : '1';
+                        nextWeekBtn.style.pointerEvents = weekOffset304 >= 0 ? 'none' : 'auto';
+                    }
+                    listItems = scopeMembers.filter(m => (m.status304 || 'Pending') === 'Approved' && extractWeekNumber(m.ref304 || '') === targetWeek304);
+                    emptyMessage = `Walang 304 Approved sa ${scopeTitle} para sa Week ${targetWeek304}.`;
+                    extraBadgeFn = m => m.ref304 ? `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-violet-100 text-violet-800 border border-violet-200">${escapeHtml(m.ref304)}</span>` : '';
+                    break;
+                }
+                case 'BAPTISM_ON_HOLD': {
+                    titleEl.textContent = `Baptism: On hold (${scopeTitle})`;
+                    subEl.textContent = 'Completed 303, 305 & 309 — Baptism currently on hold';
+                    iconEl.className = 'w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0';
+                    iconEl.innerHTML = `<i data-lucide="pause-circle" class="w-5 h-5"></i>`;
+                    listItems = scopeMembers.filter(m => isMemberForBaptism(m) && (m.baptismStatus || 'Pending') === 'On-hold');
+                    emptyMessage = `Walang Baptism: On hold sa ${scopeTitle}.`;
+                    extraBadgeFn = () => `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200">On-hold</span>`;
+                    break;
+                }
+                case 'FINAL_SCREENING': {
+                    titleEl.textContent = `For Final Screening (${scopeTitle})`;
+                    subEl.textContent = 'Scheduled for final screening with date (MM/DD)';
+                    iconEl.className = 'w-9 h-9 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0';
+                    iconEl.innerHTML = `<i data-lucide="calendar-clock" class="w-5 h-5"></i>`;
+                    listItems = scopeMembers.filter(m => isMemberForBaptism(m) && (m.baptismStatus || 'Pending') === 'For Final Screening');
+                    emptyMessage = `Walang For Final Screening sa ${scopeTitle}.`;
+                    extraBadgeFn = m => {
+                        const mmdd = formatShortMonthDay(m.baptismDate);
+                        return mmdd
+                            ? `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-indigo-600 text-white">${escapeHtml(mmdd)}</span>`
+                            : `<span class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-200 text-slate-600">No date</span>`;
+                    };
+                    break;
+                }
+                case 'BAPTISM_PENDING': {
+                    titleEl.textContent = `Baptism: Pending (${scopeTitle})`;
+                    subEl.textContent = 'Completed 303, 305 & 309 — Waiting for baptism';
+                    iconEl.className = 'w-9 h-9 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center shrink-0';
+                    iconEl.innerHTML = `<i data-lucide="hourglass" class="w-5 h-5"></i>`;
+                    listItems = scopeMembers.filter(m => isMemberForBaptism(m) && (m.baptismStatus || 'Pending') === 'Pending');
+                    emptyMessage = `Walang Baptism: Pending sa ${scopeTitle}.`;
+                    extraBadgeFn = () => `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-sky-100 text-sky-800 border border-sky-200">Pending</span>`;
+                    break;
+                }
+                case 'PENDING_304': {
+                    titleEl.textContent = `304: Pending (${scopeTitle})`;
+                    subEl.textContent = 'Sinusubok members (30/30 in 303) with pending 304 approval';
+                    iconEl.className = 'w-9 h-9 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shrink-0';
+                    iconEl.innerHTML = `<i data-lucide="clock" class="w-5 h-5"></i>`;
+                    listItems = scopeMembers.filter(m => {
+                        const l303 = Math.min(30, Object.keys(getL303Map(m)).length);
+                        return l303 >= 30 && (m.status304 || 'Pending') === 'Pending';
+                    });
+                    emptyMessage = `Walang 304: Pending sa ${scopeTitle}.`;
+                    extraBadgeFn = m => {
+                        const l305 = Math.min(15, Object.keys(m.l305 || {}).length);
+                        return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-purple-100 text-purple-800 border border-purple-200">305: ${l305}/15</span>`;
+                    };
+                    break;
+                }
+                case 'EF_PENDING': {
+                    titleEl.textContent = `EF: Pending (${scopeTitle})`;
+                    subEl.textContent = 'Active members with pending EF status';
+                    iconEl.className = 'w-9 h-9 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center shrink-0';
+                    iconEl.innerHTML = `<i data-lucide="file-clock" class="w-5 h-5"></i>`;
+                    listItems = scopeMembers.filter(m => (m.efStatus || 'Approved') === 'Pending');
+                    emptyMessage = `Walang EF: Pending sa ${scopeTitle}.`;
+                    extraBadgeFn = m => {
+                        const l303 = Math.min(30, Object.keys(getL303Map(m)).length);
+                        return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-teal-100 text-teal-800 border border-teal-200">303: ${l303}/30</span>`;
+                    };
+                    break;
+                }
+                case 'FOR_304': {
+                    titleEl.textContent = `For ≤304 (${scopeTitle})`;
+                    subEl.textContent = 'Members with ≤5 lessons left in Doktrina 303 (25–30/30) & 304 not Approved';
+                    iconEl.className = 'w-9 h-9 rounded-xl bg-cyan-100 text-cyan-700 flex items-center justify-center shrink-0';
+                    iconEl.innerHTML = `<i data-lucide="list-checks" class="w-5 h-5"></i>`;
+                    listItems = scopeMembers.filter(m => isMemberForPreScreening(m));
+                    emptyMessage = `Walang member sa For ≤304 sa ${scopeTitle}.`;
+                    extraBadgeFn = m => {
+                        const l303 = Math.min(30, Object.keys(getL303Map(m)).length);
+                        return `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-cyan-600 text-white">303: ${l303}/30</span>`;
+                    };
+                    break;
+                }
+            }
+
+            countBadgeEl.textContent = `${listItems.length} ${listItems.length === 1 ? 'member' : 'members'}`;
+
+            if (listItems.length === 0) {
+                bodyEl.innerHTML = `<div class="p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-500 text-center">${escapeHtml(emptyMessage)}</div>`;
+            } else {
+                listItems.sort((a, b) => {
+                    const pA = PUROK_LIST.indexOf(a.purok);
+                    const pB = PUROK_LIST.indexOf(b.purok);
+                    if (pA !== pB) return pA - pB;
+                    return (a.fullName || '').localeCompare(b.fullName || '');
+                });
+                bodyEl.innerHTML = `<div class="space-y-1.5">` + listItems.map((m, idx) => {
+                    const theme = PUROK_THEMES[m.purok] || { badge: 'bg-slate-100 text-slate-800' };
+                    const extraBadge = extraBadgeFn ? extraBadgeFn(m) : '';
+                    return `
+                        <div onclick="closeSummaryCardModal(); openProgressModal('${m.id}')" class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 p-2.5 bg-slate-50 hover:bg-indigo-50/70 border border-slate-200 hover:border-indigo-300 rounded-xl cursor-pointer transition">
+                            <div class="flex items-start gap-2 min-w-0">
+                                <span class="text-[11px] font-extrabold text-slate-400 w-5 shrink-0 mt-0.5">${idx + 1}.</span>
+                                <span class="text-xs font-bold text-slate-900 break-words leading-snug">${escapeHtml(m.fullName)}</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 shrink-0 pl-7 sm:pl-0 flex-wrap">
+                                ${extraBadge}
+                                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold border ${theme.badge}">${escapeHtml(m.purok)}</span>
+                                <span class="text-[10px] font-bold text-slate-500">${escapeHtml(m.purokGrupo)}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('') + `</div>`;
+            }
+            lucide.createIcons();
+        }
+
         function openWeeklyModal(type) {
             activeWeeklyModalType = type;
             activeWeeklyModalPurok = selectedPurok || 'ALL';
@@ -1944,8 +2567,79 @@
                 if (newOffset <= 0 && ((currentWeekNum + newOffset) >= 1)) {
                     weekOffset305 = newOffset;
                 }
+            } else if (cardType === 'EF') {
+                const newOffset = weekOffsetEF + delta;
+                if (newOffset <= 0 && ((currentWeekNum + newOffset) >= 1)) {
+                    weekOffsetEF = newOffset;
+                }
+            } else if (cardType === '304') {
+                const newOffset = weekOffset304 + delta;
+                if (newOffset <= 0 && ((currentWeekNum + newOffset) >= 1)) {
+                    weekOffset304 = newOffset;
+                }
             }
             updateStats();
+        }
+
+        function renderSummaryCarouselState() {
+            const slides = document.querySelectorAll('.summary-carousel-slide');
+            slides.forEach((slide, idx) => {
+                if (idx === activeSummarySlideIndex) {
+                    slide.classList.remove('hidden');
+                } else {
+                    slide.classList.add('hidden');
+                }
+            });
+
+            const selectEl = document.getElementById('summaryCarouselSelect');
+            if (selectEl) {
+                selectEl.value = String(activeSummarySlideIndex);
+            }
+
+            const dotsEl = document.getElementById('summaryCarouselDots');
+            if (dotsEl) {
+                let dotsHtml = '';
+                for (let i = 0; i < TOTAL_SUMMARY_SLIDES; i++) {
+                    const isActive = i === activeSummarySlideIndex;
+                    dotsHtml += `<button type="button" onclick="goToSummaryCarousel(${i})" title="Card ${i + 1} of ${TOTAL_SUMMARY_SLIDES}" class="${isActive ? 'w-4 h-2 bg-indigo-600' : 'w-2 h-2 bg-slate-300 hover:bg-slate-400'} rounded-full transition-all cursor-pointer shrink-0"></button>`;
+                }
+                dotsEl.innerHTML = dotsHtml;
+            }
+        }
+
+        function changeSummaryCarousel(delta) {
+            activeSummarySlideIndex = (activeSummarySlideIndex + delta + TOTAL_SUMMARY_SLIDES) % TOTAL_SUMMARY_SLIDES;
+            renderSummaryCarouselState();
+        }
+
+        function goToSummaryCarousel(index) {
+            if (index >= 0 && index < TOTAL_SUMMARY_SLIDES) {
+                activeSummarySlideIndex = index;
+                renderSummaryCarouselState();
+            }
+        }
+
+        function formatShortMonthDay(rawDate) {
+            if (!rawDate) return '';
+            const str = String(rawDate).trim();
+            if (!str) return '';
+            const parsed = parseUsOrIsoDate(str);
+            if (parsed && !isNaN(parsed.getTime())) {
+                const mm = String(parsed.getMonth() + 1).padStart(2, '0');
+                const dd = String(parsed.getDate()).padStart(2, '0');
+                return `${mm}/${dd}`;
+            }
+            const parts = str.split(/[-/]/);
+            if (parts.length === 3) {
+                if (parts[0].length === 4) {
+                    return `${parts[1].padStart(2, '0')}/${parts[2].padStart(2, '0')}`;
+                }
+                return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}`;
+            }
+            if (parts.length === 2) {
+                return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}`;
+            }
+            return str;
         }
 
         function getL303Map(member) {
@@ -2624,8 +3318,144 @@
                 missingNamesElId: 'stat305MissingNames'
             });
 
+            // Helper to render clickable member rows for the new summary carousel cards
+            const renderMemberRowList = (containerId, items, emptyText, rightBadgeFn) => {
+                const el = document.getElementById(containerId);
+                if (!el) return;
+                if (!items || items.length === 0) {
+                    el.innerHTML = `<span class="text-slate-400 italic">${escapeHtml(emptyText)}</span>`;
+                    return;
+                }
+                const sorted = [...items].sort((a, b) => (a.fullName || '').localeCompare(b.fullName || ''));
+                el.innerHTML = sorted.map(m => {
+                    const shortPurok = (m.purok || '').replace('PUROK ', 'P');
+                    const extraBadge = rightBadgeFn ? rightBadgeFn(m) : '';
+                    return `
+                        <div onclick="event.stopPropagation(); openProgressModal('${m.id}')" class="flex flex-wrap items-center justify-between gap-1 hover:bg-white/80 px-1.5 py-0.5 rounded cursor-pointer transition" title="Click to open progress">
+                            <span class="font-medium text-slate-800 break-words leading-tight">• ${escapeHtml(m.fullName)}</span>
+                            <div class="flex items-center gap-1 shrink-0">
+                                ${extraBadge}
+                                <span class="text-[9px] font-bold px-1 rounded bg-slate-200 text-slate-700">${escapeHtml(shortPurok)}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            };
+
+            // Card 6 (Slide 5): EF Week
+            const targetWeekEF = Math.max(1, currentWeekNum + weekOffsetEF);
+            const efTitleEl = document.getElementById('statEfWeekTitle');
+            const efCountEl = document.getElementById('statEfWeekCount');
+            const efSubEl = document.getElementById('statEfWeekSubtitle');
+            const nextBtnEF = document.getElementById('nextBtnEF');
+            if (efTitleEl) efTitleEl.textContent = `EF Week ${targetWeekEF}`;
+            if (efSubEl) efSubEl.textContent = `EF Approved in Week ${targetWeekEF}`;
+            if (nextBtnEF) {
+                nextBtnEF.style.opacity = weekOffsetEF >= 0 ? '0.3' : '1';
+                nextBtnEF.style.pointerEvents = weekOffsetEF >= 0 ? 'none' : 'auto';
+            }
+            const efApprovedInWeek = scopeMembers.filter(m => {
+                if ((m.efStatus || 'Approved') !== 'Approved') return false;
+                const wk = extractWeekNumber(m.efRef || '');
+                return wk === targetWeekEF;
+            });
+            if (efCountEl) efCountEl.textContent = efApprovedInWeek.length;
+            renderMemberRowList(
+                'statEfWeekList',
+                efApprovedInWeek,
+                `No EF approved in Week ${targetWeekEF}`,
+                m => m.efRef ? `<span class="text-[9px] font-bold px-1.5 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">${escapeHtml(m.efRef)}</span>` : ''
+            );
+
+            // Card 7 (Slide 6): 304 Approved (304 Week)
+            const targetWeek304 = Math.max(1, currentWeekNum + weekOffset304);
+            const w304TitleEl = document.getElementById('stat304WeekTitle');
+            const w304CountEl = document.getElementById('stat304WeekCount');
+            const w304SubEl = document.getElementById('stat304WeekSubtitle');
+            const nextBtn304 = document.getElementById('nextBtn304');
+            if (w304TitleEl) w304TitleEl.textContent = `304 Approved • Week ${targetWeek304}`;
+            if (w304SubEl) w304SubEl.textContent = `304 Approved in Week ${targetWeek304}`;
+            if (nextBtn304) {
+                nextBtn304.style.opacity = weekOffset304 >= 0 ? '0.3' : '1';
+                nextBtn304.style.pointerEvents = weekOffset304 >= 0 ? 'none' : 'auto';
+            }
+            const approved304InWeek = scopeMembers.filter(m => {
+                if ((m.status304 || 'Pending') !== 'Approved') return false;
+                const wk = extractWeekNumber(m.ref304 || '');
+                return wk === targetWeek304;
+            });
+            if (w304CountEl) w304CountEl.textContent = approved304InWeek.length;
+            renderMemberRowList(
+                'stat304WeekList',
+                approved304InWeek,
+                `No 304 approved in Week ${targetWeek304}`,
+                m => m.ref304 ? `<span class="text-[9px] font-bold px-1.5 rounded bg-violet-100 text-violet-800 border border-violet-200">${escapeHtml(m.ref304)}</span>` : ''
+            );
+
+            // Card 8 (Slide 7): Baptism: On hold
+            const listBaptismOnHold = scopeMembers.filter(m => isMemberForBaptism(m) && (m.baptismStatus || 'Pending') === 'On-hold');
+            const elOnHoldCount = document.getElementById('statCardBaptismOnHoldCount');
+            if (elOnHoldCount) elOnHoldCount.textContent = listBaptismOnHold.length;
+            renderMemberRowList('statCardBaptismOnHoldList', listBaptismOnHold, 'None on hold');
+
+            // Card 9 (Slide 8): For Final Screening (with MM/DD from baptismDate)
+            const listFinalScreening = scopeMembers.filter(m => isMemberForBaptism(m) && (m.baptismStatus || 'Pending') === 'For Final Screening');
+            const elFinalScrCount = document.getElementById('statCardFinalScreeningCount');
+            if (elFinalScrCount) elFinalScrCount.textContent = listFinalScreening.length;
+            renderMemberRowList(
+                'statCardFinalScreeningList',
+                listFinalScreening,
+                'None for final screening',
+                m => {
+                    const mmdd = formatShortMonthDay(m.baptismDate);
+                    return mmdd
+                        ? `<span class="text-[9px] font-extrabold px-1.5 rounded bg-indigo-100 text-indigo-800 border border-indigo-200">${escapeHtml(mmdd)}</span>`
+                        : `<span class="text-[9px] font-semibold px-1 rounded bg-slate-100 text-slate-400">No date</span>`;
+                }
+            );
+
+            // Card 10 (Slide 9): Baptism: Pending
+            const listBaptismPending = scopeMembers.filter(m => isMemberForBaptism(m) && (m.baptismStatus || 'Pending') === 'Pending');
+            const elBaptPendingCount = document.getElementById('statCardBaptismPendingCount');
+            if (elBaptPendingCount) elBaptPendingCount.textContent = listBaptismPending.length;
+            renderMemberRowList('statCardBaptismPendingList', listBaptismPending, 'None pending');
+
+            // Card 11 (Slide 10): 304: Pending
+            const list304Pending = scopeMembers.filter(m => {
+                const l303 = Math.min(30, Object.keys(getL303Map(m)).length);
+                return l303 >= 30 && (m.status304 || 'Pending') === 'Pending';
+            });
+            const el304PendingCount = document.getElementById('statCard304PendingCount');
+            if (el304PendingCount) el304PendingCount.textContent = list304Pending.length;
+            renderMemberRowList('statCard304PendingList', list304Pending, 'None pending');
+
+            // Card 12 (Slide 11): EF: Pending
+            const listEfPending = scopeMembers.filter(m => (m.efStatus || 'Approved') === 'Pending');
+            const elEfPendingCount = document.getElementById('statCardEfPendingCount');
+            if (elEfPendingCount) elEfPendingCount.textContent = listEfPending.length;
+            renderMemberRowList('statCardEfPendingList', listEfPending, 'None pending');
+
+            // Card 13 (Slide 12): For <=304 (<=5 lessons left in 303 & 304 not Approved)
+            const listFor304 = scopeMembers.filter(m => isMemberForPreScreening(m));
+            const elFor304Count = document.getElementById('statCardFor304Count');
+            if (elFor304Count) elFor304Count.textContent = listFor304.length;
+            renderMemberRowList(
+                'statCardFor304List',
+                listFor304,
+                'None in ≤5 left',
+                m => {
+                    const l303 = Math.min(30, Object.keys(getL303Map(m)).length);
+                    return `<span class="text-[9px] font-extrabold px-1.5 rounded bg-cyan-100 text-cyan-800 border border-cyan-200">${l303}/30</span>`;
+                }
+            );
+
+            renderSummaryCarouselState();
+
             if (activeWeeklyModalType) {
                 renderWeeklyModalContent();
+            }
+            if (activeSummaryCardModalType) {
+                renderSummaryCardModalContent();
             }
         }
 
