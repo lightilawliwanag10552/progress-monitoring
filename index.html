@@ -274,12 +274,12 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="mt-2.5 pt-2 border-t border-emerald-100">
-                            <div class="flex items-center justify-between mb-1">
-                                <span id="stat309MissingHeader" class="text-[10px] font-bold uppercase tracking-wider text-rose-700">ABSENTEE (<span id="stat309MissingCount">0</span>):</span>
+                        <div class="mt-2.5 pt-2 border-t border-emerald-100 space-y-1.5">
+                            <div class="flex items-center justify-between">
+                                <span id="stat309MissingHeader" class="text-[10px] font-bold uppercase tracking-wider text-rose-700">FULL ABSENT (<span id="stat309FullAbsentCount">0</span>) • SEMI (<span id="stat309SemiAbsentCount">0</span>)</span>
                                 <span class="text-[9px] text-slate-400 italic">Click card to expand</span>
                             </div>
-                            <div id="stat309MissingNames" class="text-[11px] text-slate-700 max-h-24 overflow-y-auto pr-1 space-y-0.5 leading-snug">
+                            <div id="stat309MissingNames" class="text-[11px] text-slate-700 max-h-28 overflow-y-auto pr-1 grid grid-cols-1 sm:grid-cols-2 gap-2 leading-snug">
                                 <span class="text-slate-400 italic">No records yet</span>
                             </div>
                         </div>
@@ -975,7 +975,7 @@
 
     <!-- Weekly Review Modal -->
     <div id="weeklyModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden border border-slate-100 flex flex-col max-h-[85vh]">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden border border-slate-100 flex flex-col max-h-[85vh]">
             <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-2.5">
                     <div id="weeklyModalIcon" class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
@@ -1403,7 +1403,7 @@
         let activeWeeklyModalType = null;
         let activeWeeklyModalPurok = 'ALL';
         let activeNotesMemberId = null;
-        let weekOffset309 = -1;
+        let weekOffset309 = 0;
         let weekOffset305 = -1;
         let weekOffsetEF = 0;
         let weekOffset304 = 0;
@@ -1806,6 +1806,31 @@
             return byYear;
         }
 
+        function getLatestCutoff309Week(refDate = new Date()) {
+            const d = new Date(refDate);
+            let wk = getIsoWeekNumber(d);
+            const day = d.getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+            const afterSunday4Pm = (day === 0) && (d.getHours() > 16 || (d.getHours() === 16 && d.getMinutes() >= 0));
+
+            // Monday to Sunday 4:00 PM cutoff: before Sunday 4:00 PM, latest completed week is wk - 1
+            if (!afterSunday4Pm) {
+                wk -= 1;
+            }
+
+            if (wk < 1) {
+                const prevYearLastDay = new Date(d.getFullYear() - 1, 11, 28);
+                return {
+                    year: prevYearLastDay.getFullYear(),
+                    week: getIsoWeekNumber(prevYearLastDay)
+                };
+            }
+
+            return {
+                year: d.getFullYear(),
+                week: wk
+            };
+        }
+
         function getIsoWeekNumber(d) {
             const target = new Date(d.valueOf());
             const dayNr = (d.getDay() + 6) % 7;
@@ -2008,9 +2033,9 @@
             const anchor = get309ApprovedAnchor(member);
             if (!anchor) return false;
 
-            const now = new Date();
-            const currentYear = now.getFullYear();
-            const currentWeek = getIsoWeekNumber(now);
+            const cutoff = getLatestCutoff309Week(new Date());
+            const currentYear = cutoff.year;
+            const currentWeek = cutoff.week;
 
             const targetOrd = Number(year) * 1000 + Number(week) * 2 + (slotType === 'we' ? 1 : 0);
             if (targetOrd <= anchor.ord) return false;
@@ -2587,7 +2612,10 @@
             if (prevBtn) { prevBtn.style.opacity = '1'; prevBtn.style.pointerEvents = 'auto'; }
 
             const is309 = activeWeeklyModalType === '309';
-            const targetWeekNum = currentWeekNum + (is309 ? weekOffset309 : weekOffset305);
+            const latest309CutoffWeek = getLatestCutoff309Week(new Date()).week;
+            const targetWeekNum = is309
+                ? Math.max(1, latest309CutoffWeek + weekOffset309)
+                : Math.max(1, currentWeekNum + weekOffset305);
             const rawTargetMembers = is309 ? scopeMembers : scopeMembers.filter(m => Object.keys(getL303Map(m)).length >= 30);
             const targetMembers = rawTargetMembers.filter(m => isMemberApplicableForWeek(m, is309 ? '309' : '305', targetWeekNum));
 
@@ -2686,40 +2714,108 @@
                 document.getElementById('weeklyModalWeSummary').textContent = `WE: ${wePct}% (${wePresentCount}/${targetMembers.length})`;
             }
 
-            if (missingHeaderEl) {
-                missingHeaderEl.innerHTML = `${getMissingLabelText(activeWeeklyModalType, withoutRecord.length)} (<span id="weeklyModalMissingCount">${withoutRecord.length}</span>):`;
-            }
-
             const missingListEl = document.getElementById('weeklyModalMissingList');
-            if (withoutRecord.length === 0) {
-                missingListEl.innerHTML = `<div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-bold text-emerald-800 text-center">Kumpleto lahat ng applicable member sa Week ${targetWeekNum}!</div>`;
-            } else {
-                withoutRecord.sort((a, b) => {
+            if (is309) {
+                const fullAbsentList = withoutRecord.filter(item => item.missingTag === 'MW & WE');
+                const semiAbsentList = withoutRecord.filter(item => item.missingTag !== 'MW & WE');
+
+                const sortByPurokAndName = (a, b) => {
                     const pA = PUROK_LIST.indexOf(a.member.purok);
                     const pB = PUROK_LIST.indexOf(b.member.purok);
                     if (pA !== pB) return pA - pB;
                     return (a.member.fullName || '').localeCompare(b.member.fullName || '');
-                });
-                missingListEl.innerHTML = withoutRecord.map((item, idx) => {
-                    const m = item.member;
-                    const theme = PUROK_THEMES[m.purok] || { badge: 'bg-slate-100 text-slate-800' };
-                    const tagBadge = item.missingTag
-                        ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-rose-100 text-rose-700 border border-rose-200">${escapeHtml(item.missingTag)}</span>`
-                        : '';
-                    return `
-                        <div onclick="closeWeeklyModal(); openProgressModal('${m.id}')" class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 p-2.5 bg-slate-50 hover:bg-indigo-50/60 border border-slate-200 hover:border-indigo-200 rounded-xl cursor-pointer transition">
-                            <div class="flex items-start gap-2 min-w-0">
-                                <span class="text-[11px] font-extrabold text-slate-400 w-5 shrink-0 mt-0.5">${idx + 1}.</span>
-                                <span class="text-xs font-bold text-slate-900 break-words leading-snug">${escapeHtml(m.fullName)}</span>
+                };
+                fullAbsentList.sort(sortByPurokAndName);
+                semiAbsentList.sort(sortByPurokAndName);
+
+                if (missingHeaderEl) {
+                    missingHeaderEl.innerHTML = `FULL ABSENT (<span id="weeklyModalFullAbsentCount">${fullAbsentList.length}</span>) • SEMI-ABSENT (<span id="weeklyModalSemiAbsentCount">${semiAbsentList.length}</span>)`;
+                }
+
+                if (withoutRecord.length === 0) {
+                    missingListEl.innerHTML = `<div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-bold text-emerald-800 text-center">Kumpleto lahat ng applicable member sa Week ${targetWeekNum}!</div>`;
+                } else {
+                    const renderModalRow = (item, idx, isSemi) => {
+                        const m = item.member;
+                        const theme = PUROK_THEMES[m.purok] || { badge: 'bg-slate-100 text-slate-800' };
+                        const tagBadge = isSemi
+                            ? `<span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-amber-100 text-amber-800 border border-amber-300 shrink-0">${escapeHtml(item.missingTag)}</span>`
+                            : `<span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold bg-rose-100 text-rose-700 border border-rose-200 shrink-0">MW &amp; WE</span>`;
+                        return `
+                            <div onclick="closeWeeklyModal(); openProgressModal('${m.id}')" class="flex items-center justify-between gap-1.5 p-2 bg-slate-50 hover:bg-indigo-50/60 border border-slate-200 hover:border-indigo-200 rounded-xl cursor-pointer transition">
+                                <div class="flex items-center gap-1.5 min-w-0">
+                                    <span class="text-[10px] font-extrabold text-slate-400 w-4 shrink-0">${idx + 1}.</span>
+                                    <span class="text-xs font-bold text-slate-900 truncate leading-snug">${escapeHtml(m.fullName)}</span>
+                                </div>
+                                <div class="flex items-center gap-1 shrink-0">
+                                    ${tagBadge}
+                                    <span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold border ${theme.badge}">${escapeHtml(m.purok.replace('PUROK ', 'P'))}</span>
+                                </div>
                             </div>
-                            <div class="flex items-center gap-1.5 shrink-0 pl-7 sm:pl-0 flex-wrap">
-                                ${tagBadge}
-                                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold border ${theme.badge}">${escapeHtml(m.purok)}</span>
-                                <span class="text-[10px] font-bold text-slate-500">${escapeHtml(m.purokGrupo)}</span>
+                        `;
+                    };
+
+                    const fullSectionHtml = `
+                        <div class="min-w-0 space-y-1.5">
+                            <div class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-rose-50 border border-rose-200 sticky top-0 z-10">
+                                <span class="text-[10px] font-extrabold uppercase tracking-wider text-rose-800">Full Absent (MW &amp; WE)</span>
+                                <span class="px-2 py-0.5 rounded-md bg-rose-600 text-white text-[10px] font-extrabold">${fullAbsentList.length}</span>
+                            </div>
+                            <div class="space-y-1.5">
+                                ${fullAbsentList.length === 0
+                                    ? `<div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-400 italic text-center">Walang full week absent</div>`
+                                    : fullAbsentList.map((item, idx) => renderModalRow(item, idx, false)).join('')}
                             </div>
                         </div>
                     `;
-                }).join('');
+
+                    const semiSectionHtml = `
+                        <div class="min-w-0 space-y-1.5">
+                            <div class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-amber-50 border border-amber-200 sticky top-0 z-10">
+                                <span class="text-[10px] font-extrabold uppercase tracking-wider text-amber-900">Semi-Absent (MW o WE)</span>
+                                <span class="px-2 py-0.5 rounded-md bg-amber-500 text-white text-[10px] font-extrabold">${semiAbsentList.length}</span>
+                            </div>
+                            <div class="space-y-1.5">
+                                ${semiAbsentList.length === 0
+                                    ? `<div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-400 italic text-center">Walang semi-absent</div>`
+                                    : semiAbsentList.map((item, idx) => renderModalRow(item, idx, true)).join('')}
+                            </div>
+                        </div>
+                    `;
+
+                    missingListEl.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 gap-3 items-start">${fullSectionHtml}${semiSectionHtml}</div>`;
+                }
+            } else {
+                if (missingHeaderEl) {
+                    missingHeaderEl.innerHTML = `${getMissingLabelText(activeWeeklyModalType, withoutRecord.length)} (<span id="weeklyModalMissingCount">${withoutRecord.length}</span>):`;
+                }
+
+                if (withoutRecord.length === 0) {
+                    missingListEl.innerHTML = `<div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-bold text-emerald-800 text-center">Kumpleto lahat ng applicable member sa Week ${targetWeekNum}!</div>`;
+                } else {
+                    withoutRecord.sort((a, b) => {
+                        const pA = PUROK_LIST.indexOf(a.member.purok);
+                        const pB = PUROK_LIST.indexOf(b.member.purok);
+                        if (pA !== pB) return pA - pB;
+                        return (a.member.fullName || '').localeCompare(b.member.fullName || '');
+                    });
+                    missingListEl.innerHTML = withoutRecord.map((item, idx) => {
+                        const m = item.member;
+                        const theme = PUROK_THEMES[m.purok] || { badge: 'bg-slate-100 text-slate-800' };
+                        return `
+                            <div onclick="closeWeeklyModal(); openProgressModal('${m.id}')" class="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 p-2.5 bg-slate-50 hover:bg-indigo-50/60 border border-slate-200 hover:border-indigo-200 rounded-xl cursor-pointer transition">
+                                <div class="flex items-start gap-2 min-w-0">
+                                    <span class="text-[11px] font-extrabold text-slate-400 w-5 shrink-0 mt-0.5">${idx + 1}.</span>
+                                    <span class="text-xs font-bold text-slate-900 break-words leading-snug">${escapeHtml(m.fullName)}</span>
+                                </div>
+                                <div class="flex items-center gap-1.5 shrink-0 pl-7 sm:pl-0 flex-wrap">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-extrabold border ${theme.badge}">${escapeHtml(m.purok)}</span>
+                                    <span class="text-[10px] font-bold text-slate-500">${escapeHtml(m.purokGrupo)}</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
             }
             lucide.createIcons();
         }
@@ -2727,8 +2823,9 @@
         function changeWeeklyOffset(cardType, delta) {
             const currentWeekNum = getIsoWeekNumber(new Date());
             if (cardType === '309') {
+                const latest309CutoffWeek = getLatestCutoff309Week(new Date()).week;
                 const newOffset = weekOffset309 + delta;
-                if (newOffset <= 0 && ((currentWeekNum + newOffset) >= 1)) {
+                if (newOffset <= 0 && ((latest309CutoffWeek + newOffset) >= 1)) {
                     weekOffset309 = newOffset;
                 }
             } else if (cardType === '305') {
@@ -3434,7 +3531,8 @@
             }
 
             const currentWeekNum = getIsoWeekNumber(new Date());
-            const targetWeek309 = Math.max(1, currentWeekNum + weekOffset309);
+            const latest309CutoffWeek = getLatestCutoff309Week(new Date()).week;
+            const targetWeek309 = Math.max(1, latest309CutoffWeek + weekOffset309);
             const targetWeek305 = Math.max(1, currentWeekNum + weekOffset305);
 
             const updateWeeklyCard = ({
@@ -3481,8 +3579,10 @@
                         const weEl = document.getElementById('stat309WeSummary');
                         if (mwEl) mwEl.textContent = '0% (0/0)';
                         if (weEl) weEl.textContent = '0% (0/0)';
-                    }
-                    if (missingHeaderEl) {
+                        if (missingHeaderEl) {
+                            missingHeaderEl.innerHTML = `FULL ABSENT (<span id="stat309FullAbsentCount">0</span>) • SEMI (<span id="stat309SemiAbsentCount">0</span>)`;
+                        }
+                    } else if (missingHeaderEl) {
                         missingHeaderEl.innerHTML = `${getMissingLabelText(cardType, 0)} (<span id="${missingCountElId}">0</span>):`;
                     }
                     missingNamesEl.innerHTML = `<span class="text-slate-400 italic">No applicable members</span>`;
@@ -3534,22 +3634,68 @@
                     if (weEl) weEl.textContent = `${wePct}% (${wePresentCount}/${targetMembers.length})`;
                 }
 
-                if (missingHeaderEl) {
-                    missingHeaderEl.innerHTML = `${getMissingLabelText(cardType, withoutRecord.length)} (<span id="${missingCountElId}">${withoutRecord.length}</span>):`;
-                }
+                if (cardType === '309') {
+                    const fullAbsentList = withoutRecord.filter(item => item.missingTag === 'MW & WE');
+                    const semiAbsentList = withoutRecord.filter(item => item.missingTag !== 'MW & WE');
 
-                if (withoutRecord.length === 0) {
-                    missingNamesEl.innerHTML = `<span class="text-emerald-700 font-semibold">Kumpleto lahat sa Week ${targetWeekNum}!</span>`;
+                    if (missingHeaderEl) {
+                        missingHeaderEl.innerHTML = `FULL ABSENT (<span id="stat309FullAbsentCount">${fullAbsentList.length}</span>) • SEMI (<span id="stat309SemiAbsentCount">${semiAbsentList.length}</span>)`;
+                    }
+
+                    if (withoutRecord.length === 0) {
+                        missingNamesEl.innerHTML = `<span class="text-emerald-700 font-semibold">Kumpleto lahat sa Week ${targetWeekNum}!</span>`;
+                    } else {
+                        fullAbsentList.sort((a, b) => (a.member.fullName || '').localeCompare(b.member.fullName || ''));
+                        semiAbsentList.sort((a, b) => (a.member.fullName || '').localeCompare(b.member.fullName || ''));
+
+                        const renderCardRow = (item, isSemi) => {
+                            const m = item.member;
+                            const shortPurok = (m.purok || '').replace('PUROK ', 'P');
+                            const tagBadge = isSemi
+                                ? `<span class="text-[8px] font-extrabold px-1 rounded bg-amber-100 text-amber-800 border border-amber-300 shrink-0">${escapeHtml(item.missingTag)}</span>`
+                                : `<span class="text-[8px] font-extrabold px-1 rounded bg-rose-100 text-rose-700 border border-rose-200 shrink-0">MW &amp; WE</span>`;
+                            return `<div onclick="event.stopPropagation(); openProgressModal('${m.id}')" class="flex items-center justify-between gap-1 hover:bg-slate-100 px-1 py-0.5 rounded cursor-pointer transition" title="Click to open progress"><span class="font-medium text-slate-800 truncate leading-tight">• ${escapeHtml(m.fullName)}</span><div class="flex items-center gap-1 shrink-0">${tagBadge}<span class="text-[9px] font-bold px-1 rounded bg-slate-200 text-slate-700">${escapeHtml(shortPurok)}</span></div></div>`;
+                        };
+
+                        const fullColHtml = `
+                            <div class="min-w-0 border-r border-slate-200/80 pr-1.5">
+                                <div class="text-[9px] font-extrabold uppercase tracking-wider text-rose-700 bg-rose-50/90 border border-rose-200/80 rounded px-1.5 py-0.5 mb-1 sticky top-0 z-10">Full Absent (${fullAbsentList.length})</div>
+                                <div class="space-y-0.5">
+                                    ${fullAbsentList.length > 0
+                                        ? fullAbsentList.map(item => renderCardRow(item, false)).join('')
+                                        : `<div class="text-[10px] text-slate-400 italic px-1 py-0.5">None</div>`}
+                                </div>
+                            </div>
+                        `;
+
+                        const semiColHtml = `
+                            <div class="min-w-0 pl-0.5">
+                                <div class="text-[9px] font-extrabold uppercase tracking-wider text-amber-800 bg-amber-50/90 border border-amber-200/80 rounded px-1.5 py-0.5 mb-1 sticky top-0 z-10">Semi (${semiAbsentList.length})</div>
+                                <div class="space-y-0.5">
+                                    ${semiAbsentList.length > 0
+                                        ? semiAbsentList.map(item => renderCardRow(item, true)).join('')
+                                        : `<div class="text-[10px] text-slate-400 italic px-1 py-0.5">None</div>`}
+                                </div>
+                            </div>
+                        `;
+
+                        missingNamesEl.innerHTML = `${fullColHtml}${semiColHtml}`;
+                    }
                 } else {
-                    withoutRecord.sort((a, b) => (a.member.fullName || '').localeCompare(b.member.fullName || ''));
-                    missingNamesEl.innerHTML = withoutRecord.map(item => {
-                        const m = item.member;
-                        const shortPurok = (m.purok || '').replace('PUROK ', 'P');
-                        const tagBadge = item.missingTag
-                            ? `<span class="text-[8px] font-extrabold px-1 rounded bg-rose-100 text-rose-700 border border-rose-200 shrink-0">${escapeHtml(item.missingTag)}</span>`
-                            : '';
-                        return `<div onclick="event.stopPropagation(); openProgressModal('${m.id}')" class="flex flex-wrap items-center justify-between gap-1 hover:bg-slate-100 px-1 py-0.5 rounded cursor-pointer transition" title="Click to open progress"><span class="font-medium text-slate-800 break-words leading-tight">• ${escapeHtml(m.fullName)}</span><div class="flex items-center gap-1 shrink-0">${tagBadge}<span class="text-[9px] font-bold px-1 rounded bg-slate-200 text-slate-700">${escapeHtml(shortPurok)}</span></div></div>`;
-                    }).join('');
+                    if (missingHeaderEl) {
+                        missingHeaderEl.innerHTML = `${getMissingLabelText(cardType, withoutRecord.length)} (<span id="${missingCountElId}">${withoutRecord.length}</span>):`;
+                    }
+
+                    if (withoutRecord.length === 0) {
+                        missingNamesEl.innerHTML = `<span class="text-emerald-700 font-semibold">Kumpleto lahat sa Week ${targetWeekNum}!</span>`;
+                    } else {
+                        withoutRecord.sort((a, b) => (a.member.fullName || '').localeCompare(b.member.fullName || ''));
+                        missingNamesEl.innerHTML = withoutRecord.map(item => {
+                            const m = item.member;
+                            const shortPurok = (m.purok || '').replace('PUROK ', 'P');
+                            return `<div onclick="event.stopPropagation(); openProgressModal('${m.id}')" class="flex flex-wrap items-center justify-between gap-1 hover:bg-slate-100 px-1 py-0.5 rounded cursor-pointer transition" title="Click to open progress"><span class="font-medium text-slate-800 break-words leading-tight">• ${escapeHtml(m.fullName)}</span><div class="flex items-center gap-1 shrink-0"><span class="text-[9px] font-bold px-1 rounded bg-slate-200 text-slate-700">${escapeHtml(shortPurok)}</span></div></div>`;
+                        }).join('');
+                    }
                 }
             };
 
@@ -3774,8 +3920,9 @@
         function getConsecutive309AbsentWeeks(member) {
             if (!member) return 0;
             const now = new Date();
-            const currentYr = now.getFullYear();
-            const currentWeek = getIsoWeekNumber(now);
+            const cutoff = getLatestCutoff309Week(now);
+            const currentYr = cutoff.year;
+            const currentWeek = cutoff.week;
             if (currentWeek < 1) return 0;
 
             const byYear = normalizeMemberC309Structure(member);
