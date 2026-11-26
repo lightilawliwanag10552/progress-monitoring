@@ -414,21 +414,21 @@
                     <!-- Slide 6: Baptism: On hold -->
                     <div data-carousel-slide="6" onclick="openSummaryCardModal('BAPTISM_ON_HOLD')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-amber-50/80 rounded-2xl border border-amber-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-amber-400 hover:shadow-md transition">
                         <div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold uppercase tracking-wider text-amber-900">Baptism: On hold</span>
+                            <div class="flex items-center justify-between gap-1.5">
+                                <span class="text-xs font-bold uppercase tracking-wider text-amber-900 truncate">Baptism: On hold</span>
                                 <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
                                     <i data-lucide="pause-circle" class="w-4 h-4"></i>
                                 </span>
                             </div>
                             <div class="mt-2 flex items-baseline gap-2">
                                 <span id="statCardBaptismOnHoldCount" class="text-2xl font-extrabold text-slate-900">0</span>
-                                <span class="text-xs text-slate-500 font-semibold">members on hold</span>
+                                <span id="statCardBaptismOnHoldRatio" class="text-xs text-slate-500 font-semibold">0 / 0 For Baptism</span>
                             </div>
                         </div>
                         <div class="mt-2.5 pt-2 border-t border-amber-100">
                             <div class="flex items-center justify-between mb-1">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-800">Members List:</span>
-                                <div class="flex items-center gap-2"><span class="text-[9px] text-slate-400 italic">Click card to expand</span><button type="button" onclick="event.stopPropagation(); filterByStatusCounter('BaptismOnHold', 'ALL')" class="text-[9px] font-bold text-amber-700 hover:underline cursor-pointer">Filter table</button></div>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-800">Baptism: On hold (<span id="statCardBaptismOnHoldSubCount">0</span>):</span>
+                                <div class="flex items-center gap-2"><button type="button" onclick="event.stopPropagation(); filterByStatusCounter('BaptismOnHold', 'ALL')" class="text-[9px] font-bold text-amber-700 hover:underline cursor-pointer">Filter table</button><span class="text-[9px] text-slate-400 italic">Click card to expand</span></div>
                             </div>
                             <div id="statCardBaptismOnHoldList" class="text-[11px] text-slate-700 max-h-24 overflow-y-auto pr-1 space-y-0.5 leading-snug">
                                 <span class="text-slate-400 italic">None on hold</span>
@@ -439,21 +439,21 @@
                     <!-- Slide 7: For Final Screening (with MM/DD date) -->
                     <div data-carousel-slide="7" onclick="openSummaryCardModal('FINAL_SCREENING')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-indigo-50/80 rounded-2xl border border-indigo-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-indigo-400 hover:shadow-md transition">
                         <div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold uppercase tracking-wider text-indigo-900">For Final Screening</span>
+                            <div class="flex items-center justify-between gap-1.5">
+                                <span class="text-xs font-bold uppercase tracking-wider text-indigo-900 truncate">For Final Screening</span>
                                 <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
                                     <i data-lucide="calendar-clock" class="w-4 h-4"></i>
                                 </span>
                             </div>
                             <div class="mt-2 flex items-baseline gap-2">
                                 <span id="statCardFinalScreeningCount" class="text-2xl font-extrabold text-slate-900">0</span>
-                                <span class="text-xs text-slate-500 font-semibold">scheduled for final screening</span>
+                                <span id="statCardFinalScreeningRatio" class="text-xs text-slate-500 font-semibold">0 / 0 For Baptism</span>
                             </div>
                         </div>
                         <div class="mt-2.5 pt-2 border-t border-indigo-100">
                             <div class="flex items-center justify-between mb-1">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-800">Members &amp; Date (MM/DD):</span>
-                                <div class="flex items-center gap-2"><span class="text-[9px] text-slate-400 italic">Click card to expand</span><button type="button" onclick="event.stopPropagation(); filterByStatusCounter('BaptismFinalScreening', 'ALL')" class="text-[9px] font-bold text-indigo-700 hover:underline cursor-pointer">Filter table</button></div>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-800">For Final Screening (<span id="statCardFinalScreeningSubCount">0</span>):</span>
+                                <div class="flex items-center gap-2"><button type="button" onclick="event.stopPropagation(); filterByStatusCounter('BaptismFinalScreening', 'ALL')" class="text-[9px] font-bold text-indigo-700 hover:underline cursor-pointer">Filter table</button><span class="text-[9px] text-slate-400 italic">Click card to expand</span></div>
                             </div>
                             <div id="statCardFinalScreeningList" class="text-[11px] text-slate-700 max-h-24 overflow-y-auto pr-1 space-y-0.5 leading-snug">
                                 <span class="text-slate-400 italic">None for final screening</span>
@@ -464,21 +464,21 @@
                     <!-- Slide 8: Baptism: Pending -->
                     <div data-carousel-slide="8" onclick="openSummaryCardModal('BAPTISM_PENDING')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-sky-50/80 rounded-2xl border border-sky-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-sky-400 hover:shadow-md transition">
                         <div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold uppercase tracking-wider text-sky-900">Baptism: Pending</span>
+                            <div class="flex items-center justify-between gap-1.5">
+                                <span class="text-xs font-bold uppercase tracking-wider text-sky-900 truncate">Baptism: Pending</span>
                                 <span class="w-8 h-8 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
                                     <i data-lucide="hourglass" class="w-4 h-4"></i>
                                 </span>
                             </div>
                             <div class="mt-2 flex items-baseline gap-2">
                                 <span id="statCardBaptismPendingCount" class="text-2xl font-extrabold text-slate-900">0</span>
-                                <span class="text-xs text-slate-500 font-semibold">for baptism (pending)</span>
+                                <span id="statCardBaptismPendingRatio" class="text-xs text-slate-500 font-semibold">0 / 0 For Baptism</span>
                             </div>
                         </div>
                         <div class="mt-2.5 pt-2 border-t border-sky-100">
                             <div class="flex items-center justify-between mb-1">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-sky-800">Members List:</span>
-                                <div class="flex items-center gap-2"><span class="text-[9px] text-slate-400 italic">Click card to expand</span><button type="button" onclick="event.stopPropagation(); filterByStatusCounter('BaptismPending', 'ALL')" class="text-[9px] font-bold text-sky-700 hover:underline cursor-pointer">Filter table</button></div>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-sky-800">Baptism: Pending (<span id="statCardBaptismPendingSubCount">0</span>):</span>
+                                <div class="flex items-center gap-2"><button type="button" onclick="event.stopPropagation(); filterByStatusCounter('BaptismPending', 'ALL')" class="text-[9px] font-bold text-sky-700 hover:underline cursor-pointer">Filter table</button><span class="text-[9px] text-slate-400 italic">Click card to expand</span></div>
                             </div>
                             <div id="statCardBaptismPendingList" class="text-[11px] text-slate-700 max-h-24 overflow-y-auto pr-1 space-y-0.5 leading-snug">
                                 <span class="text-slate-400 italic">None pending</span>
@@ -489,21 +489,21 @@
                     <!-- Slide 9: For Baptism -->
                     <div data-carousel-slide="9" onclick="openSummaryCardModal('FOR_BAPTISM')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-blue-50/80 rounded-2xl border border-blue-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-blue-400 hover:shadow-md transition">
                         <div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold uppercase tracking-wider text-blue-900">For Baptism</span>
+                            <div class="flex items-center justify-between gap-1.5">
+                                <span class="text-xs font-bold uppercase tracking-wider text-blue-900 truncate">For Baptism</span>
                                 <span class="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
                                     <i data-lucide="droplets" class="w-4 h-4"></i>
                                 </span>
                             </div>
                             <div class="mt-2 flex items-baseline gap-2">
                                 <span id="statCardForBaptismCount" class="text-2xl font-extrabold text-slate-900">0</span>
-                                <span class="text-xs text-slate-500 font-semibold">scheduled for baptism</span>
+                                <span id="statCardForBaptismRatio" class="text-xs text-slate-500 font-semibold">0 / 0 For Baptism</span>
                             </div>
                         </div>
                         <div class="mt-2.5 pt-2 border-t border-blue-100">
                             <div class="flex items-center justify-between mb-1">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-blue-800">Members &amp; Date (MM-DD-YYYY):</span>
-                                <div class="flex items-center gap-2"><span class="text-[9px] text-slate-400 italic">Click card to expand</span><button type="button" onclick="event.stopPropagation(); filterByStatusCounter('BaptismForBaptism', 'ALL')" class="text-[9px] font-bold text-blue-700 hover:underline cursor-pointer">Filter table</button></div>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-blue-800">For Baptism (<span id="statCardForBaptismSubCount">0</span>):</span>
+                                <div class="flex items-center gap-2"><button type="button" onclick="event.stopPropagation(); filterByStatusCounter('BaptismForBaptism', 'ALL')" class="text-[9px] font-bold text-blue-700 hover:underline cursor-pointer">Filter table</button><span class="text-[9px] text-slate-400 italic">Click card to expand</span></div>
                             </div>
                             <div id="statCardForBaptismList" class="text-[11px] text-slate-700 max-h-24 overflow-y-auto pr-1 space-y-0.5 leading-snug">
                                 <span class="text-slate-400 italic">None for baptism</span>
@@ -514,21 +514,21 @@
                     <!-- Slide 10: For ≤304 -->
                     <div data-carousel-slide="10" onclick="openSummaryCardModal('FOR_304')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-cyan-50/80 rounded-2xl border border-cyan-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-cyan-400 hover:shadow-md transition">
                         <div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold uppercase tracking-wider text-cyan-900">For ≤304</span>
+                            <div class="flex items-center justify-between gap-1.5">
+                                <span class="text-xs font-bold uppercase tracking-wider text-cyan-900 truncate">For ≤304</span>
                                 <span class="w-8 h-8 rounded-lg bg-cyan-100 text-cyan-700 flex items-center justify-center shrink-0">
                                     <i data-lucide="list-checks" class="w-4 h-4"></i>
                                 </span>
                             </div>
                             <div class="mt-2 flex items-baseline gap-2">
                                 <span id="statCardFor304Count" class="text-2xl font-extrabold text-slate-900">0</span>
-                                <span class="text-xs text-slate-500 font-semibold">≤5 lessons left in 303</span>
+                                <span id="statCardFor304Ratio" class="text-xs text-slate-500 font-semibold">0 / 0 Doktrina</span>
                             </div>
                         </div>
                         <div class="mt-2.5 pt-2 border-t border-cyan-100">
                             <div class="flex items-center justify-between mb-1">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-cyan-800">Members List (303 Progress):</span>
-                                <div class="flex items-center gap-2"><span class="text-[9px] text-slate-400 italic">Click card to expand</span><button type="button" onclick="event.stopPropagation(); filterByStatusCounter('PreScreening', 'ALL')" class="text-[9px] font-bold text-cyan-700 hover:underline cursor-pointer">Filter table</button></div>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-cyan-800">For ≤304 (<span id="statCardFor304SubCount">0</span>):</span>
+                                <div class="flex items-center gap-2"><button type="button" onclick="event.stopPropagation(); filterByStatusCounter('PreScreening', 'ALL')" class="text-[9px] font-bold text-cyan-700 hover:underline cursor-pointer">Filter table</button><span class="text-[9px] text-slate-400 italic">Click card to expand</span></div>
                             </div>
                             <div id="statCardFor304List" class="text-[11px] text-slate-700 max-h-24 overflow-y-auto pr-1 space-y-0.5 leading-snug">
                                 <span class="text-slate-400 italic">None in ≤5 left</span>
@@ -539,21 +539,21 @@
                     <!-- Slide 11: Inactive Members -->
                     <div data-carousel-slide="11" onclick="openSummaryCardModal('INACTIVE_MEMBERS')" class="summary-carousel-slide hidden h-full bg-gradient-to-br from-white to-rose-50/80 rounded-2xl border border-rose-200 p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-rose-400 hover:shadow-md transition">
                         <div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold uppercase tracking-wider text-rose-900">Inactive Members</span>
+                            <div class="flex items-center justify-between gap-1.5">
+                                <span class="text-xs font-bold uppercase tracking-wider text-rose-900 truncate">Inactive Members</span>
                                 <span class="w-8 h-8 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center shrink-0">
                                     <i data-lucide="user-x" class="w-4 h-4"></i>
                                 </span>
                             </div>
                             <div class="mt-2 flex items-baseline gap-2">
                                 <span id="statCardInactiveCount" class="text-2xl font-extrabold text-slate-900">0</span>
-                                <span class="text-xs text-slate-500 font-semibold">inactive (1mo+ no activity)</span>
+                                <span id="statCardInactiveRatio" class="text-xs text-slate-500 font-semibold">0 / 0 Members</span>
                             </div>
                         </div>
                         <div class="mt-2.5 pt-2 border-t border-rose-100">
                             <div class="flex items-center justify-between mb-1">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-rose-800">List &amp; Last Dates (MM-DD-YY):</span>
-                                <div class="flex items-center gap-2"><span class="text-[9px] text-slate-400 italic">Click card to expand</span><button type="button" onclick="event.stopPropagation(); filterByActivity('Inactive')" class="text-[9px] font-bold text-rose-700 hover:underline cursor-pointer">Filter table</button></div>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-rose-800">Inactive Members (<span id="statCardInactiveSubCount">0</span>):</span>
+                                <div class="flex items-center gap-2"><button type="button" onclick="event.stopPropagation(); filterByActivity('Inactive')" class="text-[9px] font-bold text-rose-700 hover:underline cursor-pointer">Filter table</button><span class="text-[9px] text-slate-400 italic">Click card to expand</span></div>
                             </div>
                             <div id="statCardInactiveList" class="text-[11px] text-slate-700 max-h-24 overflow-y-auto pr-1 space-y-1 leading-snug">
                                 <span class="text-slate-400 italic">No inactive members</span>
@@ -1081,9 +1081,9 @@
         </div>
     </div>
 
-    <!-- Generic Summary Card Expand Modal (with Purok Filter & Week Controls) -->
+    <!-- Generic Summary Card Expand Modal (Consistent with 305 Week Modal) -->
     <div id="summaryCardModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden border border-slate-100 flex flex-col max-h-[85vh]">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden border border-slate-100 flex flex-col max-h-[85vh]">
             <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0">
                 <div class="flex items-center gap-2.5 min-w-0">
                     <div id="summaryCardModalIcon" class="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
@@ -1091,12 +1091,12 @@
                     </div>
                     <div class="min-w-0">
                         <h3 id="summaryCardModalTitle" class="text-base font-bold text-slate-900 truncate">Summary Details</h3>
-                        <p id="summaryCardModalSubtitle" class="text-xs text-slate-500 truncate">Filtered view per Purok</p>
+                        <p id="summaryCardModalSubtitle" class="text-xs text-slate-500 truncate">Detailed breakdown of member records</p>
                     </div>
                 </div>
                 <button onclick="closeSummaryCardModal()" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 cursor-pointer shrink-0"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
-            <div class="px-6 py-3.5 bg-slate-50 border-b border-slate-100 flex items-center justify-between gap-2 flex-wrap shrink-0">
+            <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between gap-2 flex-wrap shrink-0">
                 <div class="flex items-center gap-1.5 flex-wrap">
                     <div id="summaryCardModalWeekControls" class="hidden items-center gap-1.5 flex-wrap">
                         <button type="button" onclick="changeSummaryCardModalWeek(-1)" class="px-2.5 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer flex items-center gap-1">
@@ -1107,7 +1107,7 @@
                         </button>
                         <select id="summaryCardModalYearSelect" onchange="changeSummaryCardModalYear(parseInt(this.value, 10))" title="Select Year" class="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-extrabold text-indigo-700 focus:outline-none cursor-pointer"></select>
                     </div>
-                    <select id="summaryCardModalPurokFilter" onchange="setSummaryCardModalPurok(this.value)" class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700 focus:outline-none">
+                    <select id="summaryCardModalPurokFilter" onchange="setSummaryCardModalPurok(this.value)" class="px-2.5 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700 focus:outline-none">
                         <option value="ALL">All Puroks</option>
                         <option value="PUROK 1">PUROK 1</option>
                         <option value="PUROK 2">PUROK 2</option>
@@ -1121,13 +1121,17 @@
                     </select>
                 </div>
                 <div class="text-right">
-                    <span id="summaryCardModalCountBadge" class="px-2.5 py-1 rounded-lg bg-slate-900 text-white text-xs font-extrabold">0 members</span>
+                    <div class="flex items-baseline justify-end gap-1.5">
+                        <span id="summaryCardModalPct" class="text-xl font-extrabold text-slate-900">0%</span>
+                        <span id="summaryCardModalRatio" class="text-xs text-slate-500 font-semibold">0 / 0</span>
+                    </div>
+                    <span id="summaryCardModalCountBadge" class="inline-block mt-0.5 px-2 py-0.5 rounded-md bg-slate-900 text-white text-[10px] font-extrabold">0 members</span>
                 </div>
             </div>
             <div class="p-6 overflow-y-auto flex-1 space-y-3" id="summaryCardModalBody">
             </div>
             <div class="px-6 py-3.5 border-t border-slate-100 bg-slate-50 flex items-center justify-between shrink-0">
-                <span class="text-[11px] text-slate-500 italic">Click a member to open progress</span>
+                <span id="summaryCardModalFooterHint" class="text-[11px] text-slate-500 italic">Click a member to open progress</span>
                 <button type="button" onclick="closeSummaryCardModal()" class="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold cursor-pointer">Close</button>
             </div>
         </div>
@@ -2216,7 +2220,10 @@
             const iconEl = document.getElementById('summaryCardModalIcon');
             const weekCtrlEl = document.getElementById('summaryCardModalWeekControls');
             const nextWeekBtn = document.getElementById('summaryCardModalNextWeekBtn');
+            const pctEl = document.getElementById('summaryCardModalPct');
+            const ratioEl = document.getElementById('summaryCardModalRatio');
             const countBadgeEl = document.getElementById('summaryCardModalCountBadge');
+            const footerHintEl = document.getElementById('summaryCardModalFooterHint');
             const bodyEl = document.getElementById('summaryCardModalBody');
 
             if (weekCtrlEl) {
@@ -2252,10 +2259,13 @@
                 const pct309 = max309 > 0 ? Math.round((sum309 / max309) * 100) : 0;
 
                 titleEl.textContent = `303, 305 & 309 Summary (${scopeTitle})`;
-                subEl.textContent = `Overall combined progress: ${overallPct}% (${sumAll} / ${maxAll})`;
+                subEl.textContent = `Overall combined progress across 303, 305 & 309`;
                 iconEl.className = 'w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0';
                 iconEl.innerHTML = `<i data-lucide="award" class="w-5 h-5"></i>`;
+                if (pctEl) pctEl.textContent = `${overallPct}%`;
+                if (ratioEl) ratioEl.textContent = `${sumAll} / ${maxAll}`;
                 countBadgeEl.textContent = `${total} ${total === 1 ? 'member' : 'members'}`;
+                if (footerHintEl) footerHintEl.textContent = 'Click a member to open progress';
 
                 const sortedMembers = [...scopeMembers].sort((a, b) => {
                     const pA = PUROK_LIST.indexOf(a.purok);
@@ -2319,8 +2329,14 @@
             }
 
             let listItems = [];
+            let denominatorCount = scopeMembers.length;
+            let denominatorLabel = scopeMembers.length === 1 ? 'member' : 'members';
             let emptyMessage = 'No records found.';
             let extraBadgeFn = null;
+            let sectionLabel = 'Members List';
+
+            const forBaptismScope = scopeMembers.filter(m => isMemberForBaptism(m));
+            const doktrinaScope = scopeMembers.filter(m => Object.keys(getL303Map(m)).length < 30 || isMemberForPreScreening(m));
 
             switch (activeSummaryCardModalType) {
                 case 'EF_WEEK': {
@@ -2345,6 +2361,7 @@
                         nextWeekBtn.style.pointerEvents = disableNext ? 'none' : 'auto';
                     }
                     listItems = scopeMembers.filter(m => (m.efStatus || 'Approved') === 'Approved' && extractWeekNumber(m.efRef || '') === targetWeekEF && getMemberEfYear(m) === selectedEfCardYear);
+                    sectionLabel = 'EF Approved Members';
                     emptyMessage = `Walang EF Approved sa ${scopeTitle} para sa Week ${targetWeekEF} • ${selectedEfCardYear}.`;
                     extraBadgeFn = m => m.efRef ? `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200">${escapeHtml(formatWeekYearRef(m.efRef, getMemberEfYear(m)))}</span>` : '';
                     break;
@@ -2371,6 +2388,7 @@
                         nextWeekBtn.style.pointerEvents = disableNext ? 'none' : 'auto';
                     }
                     listItems = scopeMembers.filter(m => (m.status304 || 'Pending') === 'Approved' && extractWeekNumber(m.ref304 || '') === targetWeek304 && getMember304Year(m) === selected304CardYear);
+                    sectionLabel = '304 Approved Members';
                     emptyMessage = `Walang 304 Approved sa ${scopeTitle} para sa Week ${targetWeek304} • ${selected304CardYear}.`;
                     extraBadgeFn = m => m.ref304 ? `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-violet-100 text-violet-800 border border-violet-200">${escapeHtml(formatWeekYearRef(m.ref304, getMember304Year(m)))}</span>` : '';
                     break;
@@ -2380,7 +2398,10 @@
                     subEl.textContent = 'Completed 303, 305 & 309 — Baptism currently on hold';
                     iconEl.className = 'w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0';
                     iconEl.innerHTML = `<i data-lucide="pause-circle" class="w-5 h-5"></i>`;
-                    listItems = scopeMembers.filter(m => isMemberForBaptism(m) && (m.baptismStatus || 'Pending') === 'On-hold');
+                    listItems = forBaptismScope.filter(m => (m.baptismStatus || 'Pending') === 'On-hold');
+                    denominatorCount = forBaptismScope.length;
+                    denominatorLabel = 'For Baptism';
+                    sectionLabel = 'Baptism: On hold';
                     emptyMessage = `Walang Baptism: On hold sa ${scopeTitle}.`;
                     extraBadgeFn = () => `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-amber-100 text-amber-800 border border-amber-200">On-hold</span>`;
                     break;
@@ -2390,7 +2411,10 @@
                     subEl.textContent = 'Scheduled for final screening with date (MM/DD)';
                     iconEl.className = 'w-9 h-9 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0';
                     iconEl.innerHTML = `<i data-lucide="calendar-clock" class="w-5 h-5"></i>`;
-                    listItems = scopeMembers.filter(m => isMemberForBaptism(m) && (m.baptismStatus || 'Pending') === 'For Final Screening');
+                    listItems = forBaptismScope.filter(m => (m.baptismStatus || 'Pending') === 'For Final Screening');
+                    denominatorCount = forBaptismScope.length;
+                    denominatorLabel = 'For Baptism';
+                    sectionLabel = 'For Final Screening';
                     emptyMessage = `Walang For Final Screening sa ${scopeTitle}.`;
                     extraBadgeFn = m => {
                         const mmdd = formatShortMonthDay(m.baptismDate);
@@ -2405,7 +2429,10 @@
                     subEl.textContent = 'Completed 303, 305 & 309 — Waiting for baptism';
                     iconEl.className = 'w-9 h-9 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center shrink-0';
                     iconEl.innerHTML = `<i data-lucide="hourglass" class="w-5 h-5"></i>`;
-                    listItems = scopeMembers.filter(m => isMemberForBaptism(m) && (m.baptismStatus || 'Pending') === 'Pending');
+                    listItems = forBaptismScope.filter(m => (m.baptismStatus || 'Pending') === 'Pending');
+                    denominatorCount = forBaptismScope.length;
+                    denominatorLabel = 'For Baptism';
+                    sectionLabel = 'Baptism: Pending';
                     emptyMessage = `Walang Baptism: Pending sa ${scopeTitle}.`;
                     extraBadgeFn = () => `<span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-sky-100 text-sky-800 border border-sky-200">Pending</span>`;
                     break;
@@ -2415,7 +2442,10 @@
                     subEl.textContent = 'Members with status "For Baptism" & Date of Baptism (MM-DD-YYYY)';
                     iconEl.className = 'w-9 h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0';
                     iconEl.innerHTML = `<i data-lucide="droplets" class="w-5 h-5"></i>`;
-                    listItems = scopeMembers.filter(m => isMemberForBaptism(m) && (m.baptismStatus || 'Pending') === 'For Baptism');
+                    listItems = forBaptismScope.filter(m => (m.baptismStatus || 'Pending') === 'For Baptism');
+                    denominatorCount = forBaptismScope.length;
+                    denominatorLabel = 'For Baptism';
+                    sectionLabel = 'For Baptism';
                     emptyMessage = `Walang member na may status na For Baptism sa ${scopeTitle}.`;
                     extraBadgeFn = m => {
                         const dFormatted = formatFullDateMMDDYYYY(m.baptismDate);
@@ -2431,6 +2461,9 @@
                     iconEl.className = 'w-9 h-9 rounded-xl bg-cyan-100 text-cyan-700 flex items-center justify-center shrink-0';
                     iconEl.innerHTML = `<i data-lucide="list-checks" class="w-5 h-5"></i>`;
                     listItems = scopeMembers.filter(m => isMemberForPreScreening(m));
+                    denominatorCount = doktrinaScope.length || scopeMembers.length;
+                    denominatorLabel = 'Doktrina';
+                    sectionLabel = 'For ≤304';
                     emptyMessage = `Walang member sa For ≤304 sa ${scopeTitle}.`;
                     extraBadgeFn = m => {
                         const l303 = Math.min(30, Object.keys(getL303Map(m)).length);
@@ -2444,6 +2477,9 @@
                     iconEl.className = 'w-9 h-9 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0';
                     iconEl.innerHTML = `<i data-lucide="user-x" class="w-5 h-5"></i>`;
                     listItems = scopeMembers.filter(m => isMemberInactive(m));
+                    denominatorCount = scopeMembers.length;
+                    denominatorLabel = scopeMembers.length === 1 ? 'member' : 'members';
+                    sectionLabel = 'Inactive Members';
                     emptyMessage = `Walang inactive member sa ${scopeTitle}.`;
                     extraBadgeFn = m => {
                         const { last303, last305, last309 } = getMemberLastDatesMMDDYY(m);
@@ -2457,10 +2493,25 @@
                 }
             }
 
+            const pctVal = denominatorCount > 0 ? Math.round((listItems.length / denominatorCount) * 100) : 0;
+            if (pctEl) pctEl.textContent = `${pctVal}%`;
+            if (ratioEl) ratioEl.textContent = `${listItems.length} / ${denominatorCount} ${denominatorLabel}`;
             countBadgeEl.textContent = `${listItems.length} ${listItems.length === 1 ? 'member' : 'members'}`;
 
+            if (footerHintEl) {
+                if (activeSummaryCardModalType === 'BAPTISM_ON_HOLD') {
+                    footerHintEl.textContent = 'Click a member to open Remarks / Notes';
+                } else if (activeSummaryCardModalType === 'FOR_304') {
+                    footerHintEl.textContent = 'Click a member to view 303 Progress & Remarks';
+                } else {
+                    footerHintEl.textContent = 'Click a member to open progress';
+                }
+            }
+
+            const sectionHeaderHtml = `<h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">${escapeHtml(sectionLabel)} (<span>${listItems.length}</span>):</h4>`;
+
             if (listItems.length === 0) {
-                bodyEl.innerHTML = `<div class="p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-500 text-center">${escapeHtml(emptyMessage)}</div>`;
+                bodyEl.innerHTML = sectionHeaderHtml + `<div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-500 text-center">${escapeHtml(emptyMessage)}</div>`;
             } else {
                 listItems.sort((a, b) => {
                     const pA = PUROK_LIST.indexOf(a.purok);
@@ -2468,17 +2519,7 @@
                     if (pA !== pB) return pA - pB;
                     return (a.fullName || '').localeCompare(b.fullName || '');
                 });
-                const footerHintEl = document.querySelector('#summaryCardModal .px-6.py-3\.5 span.italic');
-                if (footerHintEl) {
-                    if (activeSummaryCardModalType === 'BAPTISM_ON_HOLD') {
-                        footerHintEl.textContent = 'Click a member to open Remarks / Notes';
-                    } else if (activeSummaryCardModalType === 'FOR_304') {
-                        footerHintEl.textContent = 'Click a member to view 303 Progress & Remarks';
-                    } else {
-                        footerHintEl.textContent = 'Click a member to open progress';
-                    }
-                }
-                bodyEl.innerHTML = `<div class="space-y-1.5">` + listItems.map((m, idx) => {
+                bodyEl.innerHTML = sectionHeaderHtml + `<div class="space-y-1.5">` + listItems.map((m, idx) => {
                     const theme = PUROK_THEMES[m.purok] || { badge: 'bg-slate-100 text-slate-800' };
                     const extraBadge = extraBadgeFn ? extraBadgeFn(m) : '';
                     const rowClickAction = activeSummaryCardModalType === 'BAPTISM_ON_HOLD'
@@ -3817,16 +3858,27 @@
                 m => m.ref304 ? `<span class="text-[9px] font-bold px-1.5 rounded bg-violet-100 text-violet-800 border border-violet-200">${escapeHtml(formatWeekYearRef(m.ref304, getMember304Year(m)))}</span>` : ''
             );
 
+            const totalForBaptismEligible = scopeMembers.filter(m => isMemberForBaptism(m)).length;
+            const totalDoktrinaScope = scopeMembers.filter(m => Object.keys(getL303Map(m)).length < 30 || isMemberForPreScreening(m)).length;
+
             // Slide 6: Baptism: On hold (clicking member opens Remarks / Notes modal)
             const listBaptismOnHold = scopeMembers.filter(m => isMemberForBaptism(m) && (m.baptismStatus || 'Pending') === 'On-hold');
             const elOnHoldCount = document.getElementById('statCardBaptismOnHoldCount');
+            const elOnHoldRatio = document.getElementById('statCardBaptismOnHoldRatio');
+            const elOnHoldSubCount = document.getElementById('statCardBaptismOnHoldSubCount');
             if (elOnHoldCount) elOnHoldCount.textContent = listBaptismOnHold.length;
+            if (elOnHoldRatio) elOnHoldRatio.textContent = `${listBaptismOnHold.length} / ${totalForBaptismEligible} For Baptism`;
+            if (elOnHoldSubCount) elOnHoldSubCount.textContent = listBaptismOnHold.length;
             renderMemberRowList('statCardBaptismOnHoldList', listBaptismOnHold, 'None on hold', null, 'openNotesModal', 'Click to open Remarks / Notes');
 
             // Slide 7: For Final Screening (with MM/DD from baptismDate)
             const listFinalScreening = scopeMembers.filter(m => isMemberForBaptism(m) && (m.baptismStatus || 'Pending') === 'For Final Screening');
             const elFinalScrCount = document.getElementById('statCardFinalScreeningCount');
+            const elFinalScrRatio = document.getElementById('statCardFinalScreeningRatio');
+            const elFinalScrSubCount = document.getElementById('statCardFinalScreeningSubCount');
             if (elFinalScrCount) elFinalScrCount.textContent = listFinalScreening.length;
+            if (elFinalScrRatio) elFinalScrRatio.textContent = `${listFinalScreening.length} / ${totalForBaptismEligible} For Baptism`;
+            if (elFinalScrSubCount) elFinalScrSubCount.textContent = listFinalScreening.length;
             renderMemberRowList(
                 'statCardFinalScreeningList',
                 listFinalScreening,
@@ -3842,13 +3894,21 @@
             // Slide 8: Baptism: Pending
             const listBaptismPending = scopeMembers.filter(m => isMemberForBaptism(m) && (m.baptismStatus || 'Pending') === 'Pending');
             const elBaptPendingCount = document.getElementById('statCardBaptismPendingCount');
+            const elBaptPendingRatio = document.getElementById('statCardBaptismPendingRatio');
+            const elBaptPendingSubCount = document.getElementById('statCardBaptismPendingSubCount');
             if (elBaptPendingCount) elBaptPendingCount.textContent = listBaptismPending.length;
+            if (elBaptPendingRatio) elBaptPendingRatio.textContent = `${listBaptismPending.length} / ${totalForBaptismEligible} For Baptism`;
+            if (elBaptPendingSubCount) elBaptPendingSubCount.textContent = listBaptismPending.length;
             renderMemberRowList('statCardBaptismPendingList', listBaptismPending, 'None pending');
 
             // Slide 9: For Baptism (status === 'For Baptism', full name not cut, MM-DD-YYYY date)
             const listForBaptismStatus = scopeMembers.filter(m => isMemberForBaptism(m) && (m.baptismStatus || 'Pending') === 'For Baptism');
             const elForBaptismCount = document.getElementById('statCardForBaptismCount');
+            const elForBaptismRatio = document.getElementById('statCardForBaptismRatio');
+            const elForBaptismSubCount = document.getElementById('statCardForBaptismSubCount');
             if (elForBaptismCount) elForBaptismCount.textContent = listForBaptismStatus.length;
+            if (elForBaptismRatio) elForBaptismRatio.textContent = `${listForBaptismStatus.length} / ${totalForBaptismEligible} For Baptism`;
+            if (elForBaptismSubCount) elForBaptismSubCount.textContent = listForBaptismStatus.length;
             renderMemberRowList(
                 'statCardForBaptismList',
                 listForBaptismStatus,
@@ -3864,7 +3924,11 @@
             // Slide 10: For <=304 (<=5 lessons left in 303 & 304 not Approved — click opens 303 & Remarks preview)
             const listFor304 = scopeMembers.filter(m => isMemberForPreScreening(m));
             const elFor304Count = document.getElementById('statCardFor304Count');
+            const elFor304Ratio = document.getElementById('statCardFor304Ratio');
+            const elFor304SubCount = document.getElementById('statCardFor304SubCount');
             if (elFor304Count) elFor304Count.textContent = listFor304.length;
+            if (elFor304Ratio) elFor304Ratio.textContent = `${listFor304.length} / ${totalDoktrinaScope} Doktrina`;
+            if (elFor304SubCount) elFor304SubCount.textContent = listFor304.length;
             renderMemberRowList(
                 'statCardFor304List',
                 listFor304,
@@ -3877,10 +3941,14 @@
                 'Click to view Doktrina 303 progress & Remarks'
             );
 
-            // Slide 12: Inactive Members (NAME, Purok, 303(MM-DD-YY), 305(MM-DD-YY), 309(MM-DD-YY))
+            // Slide 11: Inactive Members (NAME, Purok, 303(MM-DD-YY), 305(MM-DD-YY), 309(MM-DD-YY))
             const listInactive = scopeMembers.filter(m => isMemberInactive(m));
             const elInactiveCount = document.getElementById('statCardInactiveCount');
+            const elInactiveRatio = document.getElementById('statCardInactiveRatio');
+            const elInactiveSubCount = document.getElementById('statCardInactiveSubCount');
             if (elInactiveCount) elInactiveCount.textContent = listInactive.length;
+            if (elInactiveRatio) elInactiveRatio.textContent = `${listInactive.length} / ${total} ${memberUnitText}`;
+            if (elInactiveSubCount) elInactiveSubCount.textContent = listInactive.length;
             const elInactiveList = document.getElementById('statCardInactiveList');
             if (elInactiveList) {
                 if (listInactive.length === 0) {
